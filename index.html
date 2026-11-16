@@ -8,8 +8,8 @@
 <style>
 /* ---------- Theme & base ---------- */
 :root {
-  --navy: #123b6d;
-  --blue: #2878c8;
+  --navy: #1a7e34;
+  --blue: #357bc2;
   --bg: #f4f7fb;
   --ease: cubic-bezier(.22, .8, .3, 1);
 }
@@ -73,6 +73,36 @@ button:active {
   color: #666;
   font-size: 13px;
   margin: 7px 0 15px;
+}
+
+/* ---------- Log in / Create account tabs ---------- */
+.tabs {
+  display: flex;
+  gap: 6px;
+  background: #e9eef5;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.tabs button {
+  flex: 1;
+  border: 0;
+  background: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: var(--navy);
+}
+
+.tabs button.active {
+  background: var(--navy);
+  color: #fff;
+}
+
+.primary:disabled {
+  opacity: .6;
+  cursor: wait;
 }
 
 /* ---------- Header & menu ---------- */
@@ -391,6 +421,79 @@ label {
   margin-bottom: 15px;
 }
 
+/* ---------- Smart Matches ---------- */
+.match-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 10px 0 12px;
+}
+
+.match-pair img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 6px 0;
+}
+
+.match-pair h3 {
+  font-size: 15px;
+  color: var(--navy);
+}
+
+.badge.high {
+  background: #dff5e7;
+  color: #08752f;
+}
+
+.badge.possible {
+  background: #fff3cd;
+  color: #664d03;
+}
+
+/* ---------- Tutorial ---------- */
+.steps {
+  list-style: none;
+  counter-reset: step;
+  margin: 10px 0 4px;
+}
+
+.steps li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 40px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tip {
+  background: #eaf3ff;
+  color: var(--navy);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 /* ---------- Help assistant ---------- */
 #botBtn {
   position: fixed;
@@ -568,6 +671,10 @@ label {
   <div class="login-card">
     <h1>🔎 Smart Recovery Hub</h1>
     <p class="small">A Web-Based Lost and Found System for User-Friendly Recovery</p>
+    <div class="tabs">
+      <button id="tabLogin" class="active" onclick="setAuthMode('login')">Log In</button>
+      <button id="tabSignup" onclick="setAuthMode('signup')">Create Account</button>
+    </div>
     <label for="loginName">Full Name</label>
     <input id="loginName" placeholder="Enter your full name">
     <label for="loginSchool">School</label>
@@ -579,7 +686,15 @@ label {
       <option>Cuenca Institute</option>
       <option>Kalayaan Christian School</option>
     </select>
-    <button class="primary" style="width:100%" onclick="login()">Enter Smart Recovery Hub</button>
+    <label for="loginPass">Password</label>
+    <input id="loginPass" type="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')submitAuth()">
+    <div id="confirmBox" class="hidden">
+      <label for="loginPass2">Confirm Password</label>
+      <input id="loginPass2" type="password" placeholder="Re-enter your password" onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>
+    <label style="font-weight:normal;display:block;margin-bottom:15px"><input type="checkbox" onchange="togglePass()" id="showPass" style="width:auto;margin:0 6px 0 0">Show password</label>
+    <button id="authBtn" class="primary" style="width:100%" onclick="submitAuth()">Log In</button>
+    <p class="small" id="authHint">New here? Tap “Create Account” first.</p>
   </div>
 </div>
 
@@ -593,6 +708,8 @@ label {
         <button onclick="showPage('home')">🏠 Home</button>
         <button onclick="showPage('report')">📝 Report Item</button>
         <button onclick="showPage('items')">🔎 Items</button>
+        <button onclick="showPage('matches')">🧩 Smart Matches</button>
+        <button onclick="showPage('tutorial')">📖 How to Use</button>
         <button onclick="showPage('credits')">👥 Credits</button>
         <button onclick="showPage('admin')">🛠️ Admin</button>
         <button onclick="logout()">🚪 Logout</button>
@@ -640,6 +757,12 @@ label {
         <p>Lost or found something? Submit a report.</p>
         <br>
         <button class="primary" onclick="showPage('report')">Report Item</button>
+      </div>
+      <div class="card">
+        <h2>📖 New here?</h2>
+        <p>Learn how to report, find, and claim items in a few easy steps.</p>
+        <br>
+        <button class="primary" onclick="showPage('tutorial')">How to Use</button>
       </div>
     </section>
 
@@ -694,6 +817,71 @@ label {
       <div id="reportsContainer"></div>
     </section>
 
+    <!-- Smart Matches page -->
+    <section id="matches" class="page">
+      <div class="hero">
+        <h1>🧩 Smart Matches</h1>
+        <p>Lost and Found reports from your school that look alike.</p>
+      </div>
+      <div class="notice">A match is only a suggestion based on similar words, place, and date. It does not prove who owns an item. Only the finder's code does.</div>
+      <div id="matchesContainer"></div>
+    </section>
+
+    <!-- Tutorial page -->
+    <section id="tutorial" class="page">
+      <div class="hero">
+        <h1>📖 How to Use</h1>
+        <p>A quick guide for students. You can open it any time from the ☰ Menu.</p>
+      </div>
+      <div class="card">
+        <h2>1️⃣ Log in</h2>
+        <ol class="steps">
+          <li>First time? Tap <strong>Create Account</strong>, type your full name, choose your school, and make a password (at least 6 characters).</li>
+          <li>Next time, tap <strong>Log In</strong> with the same name, school, and password.</li>
+          <li>You will only see reports from your own school.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h2>😢 I lost something</h2>
+        <ol class="steps">
+          <li>Open the <strong>☰ Menu</strong> and tap <strong>Report Item</strong>.</li>
+          <li>Choose <strong>Lost Item</strong>.</li>
+          <li>Write the item name, a short description, where you last had it, and the date.</li>
+          <li>Add a clear photo, then tap <strong>Submit Report</strong>.</li>
+          <li>Check <strong>Items</strong> and <strong>Smart Matches</strong> every day. If someone found it, a Found report will appear.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h2>🙌 I found something</h2>
+        <ol class="steps">
+          <li>Open <strong>Report Item</strong> and choose <strong>Found Item</strong>.</li>
+          <li>Fill in the details, add a photo, and tap <strong>Submit Report</strong>.</li>
+          <li>You will get a private <strong>verification code</strong>. Write it down or tap <strong>Copy Code</strong>.</li>
+          <li>Bring the item to the <strong>Guard House</strong>.</li>
+          <li>Give the code only to the real owner.</li>
+        </ol>
+        <div class="tip">💡 Before you share the code, ask the person to describe the item so you know it is really theirs.</div>
+      </div>
+      <div class="card">
+        <h2>🔎 Is it my item? (claiming)</h2>
+        <ol class="steps">
+          <li>Open <strong>Items</strong>. Search by name, or filter by Lost, Found, or Returned.</li>
+          <li>Find your item in a <strong>Found</strong> report.</li>
+          <li>Ask the finder for the code and pick up your item at the <strong>Guard House</strong>.</li>
+          <li>Type the code under <strong>Owner Verification</strong> and tap <strong>Verify &amp; Mark as Returned</strong>.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h2>✅ Good to know</h2>
+        <ol class="steps">
+          <li>The code is saved only on the phone or browser you used to report. Do not clear your browser data until the item is returned.</li>
+          <li>Returned items are removed automatically after 24 hours.</li>
+          <li>Stuck? Tap the 💬 button at the bottom right to ask the Recovery Helper.</li>
+          <li>Using a shared device? Tap <strong>Logout</strong> in the ☰ Menu when you are done.</li>
+        </ol>
+      </div>
+    </section>
+
     <!-- Credits page -->
     <section id="credits" class="page">
       <div class="card">
@@ -709,7 +897,7 @@ label {
           <p>Mark Benjamin S. Romero - Leader</p>
         </div>
         <div class="credit">
-          <h3>Programmed by</h3>
+          <h3>Developer</h3>
           <p>Benjamin Romero</p>
         </div>
         <div class="credit">
@@ -729,9 +917,7 @@ label {
       <div class="card">
         <h2>🛠️ Admin Panel</h2>
         <p class="small">Limited to the logged-in school.</p>
-        <div class="notice">Admin access is for authorized project administrators only.</div>
-        <input id="adminCode" type="password" placeholder="Enter admin code">
-        <button class="primary" onclick="adminLogin()">Admin Login</button>
+        <div class="notice" id="adminNotice">This page is for authorized administrators only.</div>
       </div>
       <div id="adminPanel" class="hidden">
         <div class="card">
@@ -759,27 +945,36 @@ label {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc,
+  getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import {
+  getFirestore, collection, onSnapshot, doc, getDoc, setDoc, writeBatch,
   serverTimestamp, query, where
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-functions.js";
 
-// If you lost access to this Firebase project, create a new one and paste its config here.
-const db = getFirestore(initializeApp({
-  apiKey: "AIzaSyAnqUiLmFzqvqAeocVQqYf8UWTQG8DQXTbM",
-  authDomain: "cuenca-shs-lost-and-found.firebaseapp.com",
-  projectId: "cuenca-shs-lost-and-found",
-  storageBucket: "cuenca-shs-lost-and-found.firebasestorage.app",
-  messagingSenderId: "870729158846",
-  appId: "1:870729158846:web:6ed5201edd7ae3d2668eef",
-  measurementId: "G-BWFH9M8NKZ"
-}));
+// ============ FIREBASE CONFIG ============
+// Paste YOUR web app's config here: Firebase Console > Project settings > Your apps > Web app.
+// It must be the SAME project where you turned on Email/Password sign-in, published the rules,
+// and deployed the Cloud Functions.
+const app = initializeApp({
+  apiKey: "AIzaSyDwmXN-v25_sWL6cs7q4TNm22nERgUrV_M",
+  authDomain: "smart-recovery-hub-new.firebaseapp.com",
+  projectId: "smart-recovery-hub-new",
+  storageBucket: "smart-recovery-hub-new.firebasestorage.app",
+  messagingSenderId: "311729123773",
+  appId: "1:311729123773:web:8018854f08b239a45b22d4",
+  measurementId: "G-T3QMF4CR0H"
+});
+const db = getFirestore(app);
+const auth = getAuth(app);
+const claimFn = httpsCallable(getFunctions(app, "us-central1"), "claimItem");
 
 const SCHOOLS = [
   "Cuenca Senior High School", "Cuenca National High School", "Fermin La Rosa National High School",
   "Cuenca Institute", "Kalayaan Christian School"
 ];
-const ADMIN_CODE = "cuencaseniorhighschoolpr2prog";
-let me = null, reports = [], unsub = null, isAdmin = false;
+let me = null, reports = [], unsub = null, isAdmin = false, authBusy = false;
 const seen = new Set();
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "")
@@ -790,23 +985,129 @@ const esc = v => String(v ?? "")
   .replace(/'/g, "&#039;");
 const getTime = r => r.createdAt && r.createdAt.toMillis ? r.createdAt.toMillis() : 0;
 
-window.login = () => {
-  const name = $("loginName").value.trim(),
-    school = $("loginSchool").value;
+/* ---------- Accounts (Firebase Authentication) ---------- */
+let authMode = "login";
+const norm = s => s.trim().replace(/\s+/g, " ");
+const hex = b => Array.from(new Uint8Array(b), x => x.toString(16).padStart(2, "0")).join("");
+localStorage.removeItem("smartRecoveryStudent"); // old session key from the previous version
+
+// Students log in with name + school + password. Firebase Auth needs an email-style ID,
+// so one is built from the name and school (it is never shown and never used to send mail).
+async function accountEmail(name, school) {
+  const bytes = new TextEncoder().encode(norm(name).toLowerCase() + "|" + school);
+  return "u" + hex(await crypto.subtle.digest("SHA-256", bytes)).slice(0, 32) + "@students.smartrecovery.app";
+}
+
+function authMessage(e) {
+  const c = e.code || "";
+  if (c === "auth/email-already-in-use")
+    return "This name already has an account at this school. Please tap Log In instead.";
+  if (["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found", "auth/invalid-login-credentials"].includes(c))
+    return "❌ Incorrect name, school, or password.\n\nNew here? Tap “Create Account”.";
+  if (c.includes("api-key-not-valid") || c === "auth/invalid-api-key")
+    return "The Firebase API key in this page is not valid.\n\nOpen Firebase Console > Project settings > Your apps, copy your web app's firebaseConfig, and paste it near the top of the script.";
+  if (c === "auth/weak-password")
+    return "Password must be at least 6 characters.";
+  if (c === "auth/operation-not-allowed")
+    return "Email/Password sign-in is not turned on in Firebase yet.";
+  if (c === "auth/too-many-requests")
+    return "Too many tries. Please wait a few minutes and try again.";
+  if (c === "auth/network-request-failed")
+    return "No internet connection. Please try again.";
+  return "Something went wrong.\n\nReason: " + (c || e.message);
+}
+
+window.setAuthMode = m => {
+  authMode = m;
+  const s = m === "signup";
+  $("tabLogin").classList.toggle("active", !s);
+  $("tabSignup").classList.toggle("active", s);
+  $("confirmBox").classList.toggle("hidden", !s);
+  $("authBtn").textContent = s ? "Create Account" : "Log In";
+  $("authHint").textContent = s
+      ? "Use the same name and school every time you log in."
+      : "New here? Tap “Create Account” first.";
+};
+
+window.togglePass = () => {
+  const t = $("showPass").checked ? "text" : "password";
+  $("loginPass").type = t;
+  $("loginPass2").type = t;
+};
+
+// Reads the student's profile (name, school, role). Creates it the first time.
+async function loadProfile(user, name, school) {
+  const ref = doc(db, "users", user.uid), snap = await getDoc(ref);
+  if (snap.exists())
+    return snap.data();
+  const p = { name, schoolName: school, role: "student" };
+  await setDoc(ref, { ...p, createdAt: serverTimestamp() });
+  return p;
+}
+
+window.submitAuth = async () => {
+  const name = norm($("loginName").value), school = $("loginSchool").value, pw = $("loginPass").value;
   if (!name)
     return alert("Please enter your full name.");
   if (!SCHOOLS.includes(school))
     return alert("Please select a valid school.");
-  me = { name, schoolName: school };
-  localStorage.setItem("smartRecoveryStudent", JSON.stringify(me));
-  startApp();
+  if (!pw)
+    return alert("Please enter your password.");
+  if (authMode === "signup") {
+    if (pw.length < 6)
+      return alert("Password must be at least 6 characters.");
+    if (pw !== $("loginPass2").value)
+      return alert("Passwords do not match.");
+  }
+  const btn = $("authBtn");
+  btn.disabled = true;
+  authBusy = true;
+  try {
+    const email = await accountEmail(name, school);
+    const cred = authMode === "signup"
+        ? await createUserWithEmailAndPassword(auth, email, pw)
+        : await signInWithEmailAndPassword(auth, email, pw);
+    const p = await loadProfile(cred.user, name, school);
+    me = { uid: cred.user.uid, name: p.name, schoolName: p.schoolName, role: p.role || "student" };
+    $("loginPass").value = "";
+    $("loginPass2").value = "";
+    startApp();
+  }
+  catch (e) {
+    console.error(e);
+    alert(authMessage(e));
+  }
+  finally {
+    authBusy = false;
+    btn.disabled = false;
+  }
 };
+
+// Keeps students logged in after a page refresh.
+onAuthStateChanged(auth, async user => {
+  if (authBusy || !user || (me && me.uid === user.uid))
+    return;
+  try {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (!snap.exists())
+      return await signOut(auth);
+    const p = snap.data();
+    me = { uid: user.uid, name: p.name, schoolName: p.schoolName, role: p.role || "student" };
+    startApp();
+  }
+  catch (e) {
+    console.error(e);
+  }
+});
 
 function startApp() {
   $("loginPage").classList.add("hidden");
   $("app").classList.remove("hidden");
   $("homeUser").textContent = me.name;
   ["homeSchool", "itemsSchool", "reportSchool", "adminSchool"].forEach(i => $(i).textContent = me.schoolName);
+  isAdmin = me.role === "admin";
+  $("adminPanel").classList.toggle("hidden", !isAdmin);
+  $("adminNotice").classList.toggle("hidden", isAdmin);
   $("itemDate").value = new Date().toISOString().split("T")[0];
   updateReportLabels();
   showPage("home");
@@ -816,33 +1117,27 @@ function startApp() {
         + "! I can explain how to report, search, and claim items. Tap a question or type your own.");
 }
 
-function restore() {
-  try {
-    const u = JSON.parse(localStorage.getItem("smartRecoveryStudent") || "null");
-    if (u && u.name && SCHOOLS.includes(u.schoolName)) {
-      me = u;
-      startApp();
-    }
-  }
-  catch (e) {
-    localStorage.removeItem("smartRecoveryStudent");
-  }
-}
-
-window.logout = () => {
+window.logout = async () => {
   if (unsub)
     unsub();
   unsub = null;
-  localStorage.removeItem("smartRecoveryStudent");
   me = null;
   reports = [];
   isAdmin = false;
+  seen.clear();
+  try {
+    await signOut(auth);
+  }
+  catch (e) {
+    console.error(e);
+  }
   $("app").classList.add("hidden");
   $("loginPage").classList.remove("hidden");
-  $("loginName").value = "";
-  $("loginSchool").value = "";
+  ["loginName", "loginSchool", "loginPass", "loginPass2"].forEach(i => $(i).value = "");
   $("reportsContainer").innerHTML = "";
+  $("matchesContainer").innerHTML = "";
   $("adminPanel").classList.add("hidden");
+  setAuthMode("login");
 };
 
 window.toggleMenu = () => $("menu").classList.toggle("open");
@@ -912,7 +1207,9 @@ window.submitReport = async () => {
       codes = genCodes();
       hashes = await Promise.all(codes.map(hashCode));
     }
-    const ref = await addDoc(collection(db, "reports"), {
+    const reportRef = doc(collection(db, "reports")),
+      batch = writeBatch(db);
+    batch.set(reportRef, {
       itemName,
       description,
       location,
@@ -922,16 +1219,20 @@ window.submitReport = async () => {
       photo,
       schoolName: me.schoolName,
       reporterName: me.name,
+      reporterId: me.uid,
       foundReturnLocation: type === "Found" ? "Guard House" : null,
-      verificationCodeHashes: hashes,
       verificationPassed: false,
       verifiedOwnerName: null,
       verifiedAt: null,
       createdAt: serverTimestamp(),
       returnedAt: null
     });
+    // The code's hash is kept in a private document that students cannot read.
+    if (type === "Found")
+      batch.set(doc(reportRef, "private", "verification"), { codeHashes: hashes, reporterId: me.uid, failedAttempts: 0 });
+    await batch.commit();
     if (type === "Found") {
-      localStorage.setItem("founderCodes_" + ref.id, JSON.stringify(codes));
+      localStorage.setItem("founderCodes_" + reportRef.id, JSON.stringify(codes));
       alert("✅ FOUND ITEM REPORT CREATED!\n\nYour verification code:\n\n" + codes[0]
           + "\n\nKEEP THIS PRIVATE. Give it only to the real owner.");
     }
@@ -942,7 +1243,7 @@ window.submitReport = async () => {
   }
   catch (e) {
     console.error(e);
-    alert("Unable to submit report.\n\nCheck your Firestore Rules.");
+    alert("Unable to submit report.\n\nReason: " + (e.code || e.message));
   }
 };
 
@@ -960,8 +1261,8 @@ function listen() {
     });
     stats();
     renderReports();
+    renderMatches();
     renderAdmin();
-    cleanup();
   }, e => {
     console.error(e);
     $("reportsContainer").innerHTML = '<div class="card"><h3>⚠️ Reports unavailable</h3><p class="small">Check your Firestore configuration and Rules.</p></div>';
@@ -993,7 +1294,7 @@ function card(r, i) {
   const isNew = !seen.has(r.id);
   let v = "";
   if (r.type === "Found" && r.status !== "Returned") {
-    if (me.name === r.reporterName) {
+    if (r.reporterId ? r.reporterId === me.uid : me.name === r.reporterName) {
       const s = localStorage.getItem("founderCodes_" + r.id);
       if (s) {
         const c = JSON.parse(s);
@@ -1003,15 +1304,11 @@ function card(r, i) {
                 + '\')">📋 Copy Code</button></div>';
       }
     }
-    else if (sessionStorage.getItem("verified_" + r.id) === "true") {
-      v = '<div class="verification-box"><h3>✅ Owner Verified</h3><p>The code is correct.</p><button class="return" onclick="markReturned(\''
-          + r.id + '\')">✅ Mark as Returned</button></div>';
-    }
     else {
-      v = '<div class="verification-box"><h3>🔐 Owner Verification</h3><p>Enter the code given by the person who found this item.</p><input class="code-input" id="code_'
+      v = '<div class="verification-box"><h3>🔐 Owner Verification</h3><p>Pick up your item at the Guard House, then enter the code given by the finder.</p><input class="code-input" id="code_'
           + r.id
-          + '" maxlength="8" placeholder="Enter code"><button class="primary" onclick="verifyFound(\''
-          + r.id + '\')">🔓 Verify Code</button></div>';
+          + '" maxlength="8" placeholder="Enter code"><button class="primary" onclick="claimItem(\''
+          + r.id + '\')">🔓 Verify &amp; Mark as Returned</button></div>';
     }
   }
   if (r.status === "Returned")
@@ -1029,51 +1326,20 @@ function card(r, i) {
         + '</div>';
 }
 
-window.verifyFound = async (id) => {
-  const r = reports.find(x => x.id === id);
-  if (!r)
-    return alert("Report not found.");
-  if (r.type !== "Found" || r.status === "Returned")
-    return alert("This item cannot be verified.");
+// The server checks the code and marks the item as Returned (students cannot do it directly).
+window.claimItem = async (id) => {
   const code = $("code_" + id).value.trim().toUpperCase();
   if (!code)
     return alert("Please enter the code.");
-  try {
-    const st = r.verificationCodeHashes || [];
-    if (!st.includes(await hashCode(code)))
-      return alert("❌ Verification failed.\n\nThe code is incorrect.");
-    sessionStorage.setItem("verified_" + id, "true");
-    renderReports();
-    alert("✅ CODE IS CORRECT!\n\nThe Mark as Returned button is now unlocked.");
-  }
-  catch (e) {
-    console.error(e);
-    alert("Verification failed.");
-  }
-};
-
-window.markReturned = async (id) => {
-  if (sessionStorage.getItem("verified_" + id) !== "true")
-    return alert("Verify the code first.");
-  const r = reports.find(x => x.id === id);
-  if (!r || r.status === "Returned" || r.type !== "Found")
-    return;
   if (!confirm("Have you received the item from the finder?\n\nMark this item as Returned?"))
     return;
   try {
-    await updateDoc(doc(db, "reports", id), {
-      status: "Returned",
-      returnedAt: serverTimestamp(),
-      verificationPassed: true,
-      verifiedOwnerName: me.name,
-      verifiedAt: serverTimestamp()
-    });
-    sessionStorage.removeItem("verified_" + id);
-    alert("✅ Item marked as Returned!");
+    await claimFn({ reportId: id, code });
+    alert("✅ Code is correct. Item marked as Returned!");
   }
   catch (e) {
     console.error(e);
-    alert("Unable to mark item as Returned.");
+    alert(e.message || "Unable to verify the code.");
   }
 };
 
@@ -1087,14 +1353,6 @@ window.copyCodes = id => {
   navigator.clipboard
       ? navigator.clipboard.writeText(t).then(() => alert("✅ Code copied!")).catch(() => alert(t))
       : alert(t);
-};
-
-window.adminLogin = () => {
-  if ($("adminCode").value !== ADMIN_CODE)
-    return alert("❌ Incorrect admin code.");
-  isAdmin = true;
-  $("adminPanel").classList.remove("hidden");
-  renderAdmin();
 };
 
 function renderAdmin() {
@@ -1118,31 +1376,98 @@ window.adminDelete = async (id) => {
   if (!r || r.schoolName !== me.schoolName || !confirm("Delete this report?"))
     return;
   try {
-    await deleteDoc(doc(db, "reports", id));
+    const batch = writeBatch(db), ref = doc(db, "reports", id);
+    batch.delete(ref);
+    batch.delete(doc(ref, "private", "verification"));
+    await batch.commit();
     localStorage.removeItem("founderCodes_" + id);
     alert("✅ Report deleted.");
   }
   catch (e) {
     console.error(e);
-    alert("Failed to delete report.");
+    alert("Failed to delete report.\n\nReason: " + (e.code || e.message));
   }
 };
 
-async function cleanup() {
-  for (const r of reports) {
-    if (r.status !== "Returned" || !r.returnedAt || !r.returnedAt.toMillis)
-      continue;
-    if (Date.now() - r.returnedAt.toMillis() >= 864e5) {
-      try {
-        await deleteDoc(doc(db, "reports", r.id));
-        localStorage.removeItem("founderCodes_" + r.id);
-      }
-      catch (e) {
-        console.error(e);
-      }
-    }
-  }
+/* ---------- Smart Matches (runs in your browser, on your school's reports only) ---------- */
+const MATCH_WEIGHTS = { name: 0.40, description: 0.30, location: 0.20, date: 0.10 }; // change to tune matching
+const HIGH_SCORE = 0.60, POSSIBLE_SCORE = 0.35;
+const STOP_WORDS = new Set(["the", "a", "an", "of", "and", "or", "with", "in", "on", "at", "to", "my", "is", "it",
+  "this", "that", "for", "from", "was", "has", "have", "item", "lost", "found"]);
+const words = t => String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(w => w.length > 1 && !STOP_WORDS.has(w));
+
+// Share of words two texts have in common (0 to 1). Words that start the same also count.
+function similarity(a, b) {
+  const A = [...new Set(words(a))], B = [...new Set(words(b))];
+  if (!A.length || !B.length)
+    return 0;
+  const same = (x, y) => x === y || (x.length > 3 && y.length > 3 && (x.startsWith(y) || y.startsWith(x)));
+  const hit = A.filter(x => B.some(y => same(x, y))).length;
+  return Math.min(1, 2 * hit / (A.length + B.length));
 }
+
+function dateScore(a, b) {
+  const d = Math.abs(new Date(a) - new Date(b)) / 864e5;
+  return isNaN(d) ? 0 : Math.max(0, 1 - d / 14);
+}
+
+function scoreMatch(l, f) {
+  const parts = {
+    name: similarity(l.itemName, f.itemName),
+    description: similarity(l.description, f.description),
+    location: similarity(l.location, f.location),
+    date: dateScore(l.date, f.date)
+  };
+  const score = Object.keys(MATCH_WEIGHTS).reduce((sum, k) => sum + MATCH_WEIGHTS[k] * parts[k], 0);
+  return { score, parts };
+}
+
+const isMine = r => r.reporterId ? r.reporterId === me.uid : r.reporterName === me.name;
+
+function matchList() {
+  const lost = reports.filter(r => r.type === "Lost" && r.status === "Lost");
+  const found = reports.filter(r => r.type === "Found" && r.status === "Found");
+  const out = [];
+  lost.forEach(l => found.forEach(f => {
+    const m = scoreMatch(l, f);
+    if (m.score >= POSSIBLE_SCORE)
+      out.push({ lost: l, found: f, mine: isMine(l), ...m });
+  }));
+  return out.sort((a, b) => (b.mine - a.mine) || (b.score - a.score)).slice(0, 50);
+}
+
+const pct = x => Math.round(x * 100) + "%";
+
+function matchCard(m) {
+  const high = m.score >= HIGH_SCORE;
+  const side = (label, r) => '<div><p class="small">' + label + '</p>'
+      + (r.photo ? '<img src="' + esc(r.photo) + '" alt="' + esc(r.itemName) + '">' : '')
+      + '<h3>' + esc(r.itemName) + '</h3></div>';
+  const row = (label, a, b) => '<p><strong>' + label + ':</strong> ' + esc(a) + ' &rarr; ' + esc(b) + '</p>';
+  return '<div class="card"><span class="badge ' + (high ? "high" : "possible") + '">'
+      + (high ? "High-confidence suggestion" : "Possible match") + ' · ' + pct(m.score) + '</span> '
+      + (m.mine ? '<span class="badge lost">Your lost report</span>' : '')
+      + '<div class="match-pair">' + side("Lost", m.lost) + side("Found", m.found) + '</div>'
+      + '<button class="secondary" onclick="this.nextElementSibling.classList.toggle(\'hidden\')">View Match</button>'
+      + '<div class="verification-box hidden"><h3>Matching details</h3>'
+      + '<p>Name ' + pct(m.parts.name) + ' · Description ' + pct(m.parts.description)
+      + ' · Location ' + pct(m.parts.location) + ' · Date ' + pct(m.parts.date) + '</p><br>'
+      + row("Description", m.lost.description, m.found.description)
+      + row("Location", m.lost.location, m.found.location)
+      + row("Date", m.lost.date, m.found.date)
+      + '<p class="small">To claim a Found item, ask the finder for the code and use Items. A match alone never returns an item.</p>'
+      + '</div></div>';
+}
+
+window.renderMatches = () => {
+  if (!me)
+    return;
+  const list = matchList();
+  $("matchesContainer").innerHTML = list.length
+      ? list.map(matchCard).join("")
+      : '<div class="card empty"><h3>No possible matches yet</h3><p>When a Lost and a Found report look alike, they will appear here.</p></div>';
+};
 
 /* ---------- Help assistant (rule-based, works offline) ---------- */
 const KB = [
@@ -1159,12 +1484,12 @@ const KB = [
   {
     q: "What is the verification code?",
     k: ["code", "codes", "verify", "verification", "owner"],
-    a: "The code proves someone is the real owner. The finder gets 1 code after reporting a found item. The owner enters it under that item in Items → Verify Code. When it is correct, Mark as Returned unlocks."
+    a: "The code proves someone is the real owner. The finder gets 1 code after reporting a found item. The owner types it under that item in Items and taps Verify & Mark as Returned. The server checks the code, so only the right code works."
   },
   {
     q: "How do I claim my item?",
     k: ["claim", "get my", "return", "mine", "owner", "mark"],
-    a: "1. Open Items and find your item.\n2. Ask the finder for the code.\n3. Enter it and tap Verify Code.\n4. Pick up the item at the Guard House, then tap Mark as Returned."
+    a: "1. Open Items and find your item.\n2. Ask the finder for the code and pick up the item at the Guard House.\n3. Type the code under Owner Verification and tap Verify & Mark as Returned."
   },
   {
     q: "How do I search for an item?",
@@ -1190,6 +1515,16 @@ const KB = [
     q: "How do I log out?",
     k: ["logout", "log out", "sign out", "exit"],
     a: "Open ☰ Menu and tap Logout."
+  },
+  {
+    q: "What are Smart Matches?",
+    k: ["match", "matches", "smart", "similar", "suggest"],
+    a: "Smart Matches compares Lost and Found reports from your school and shows pairs that look alike. It is only a suggestion. To get an item back, ask the finder for the code and use Items."
+  },
+  {
+    q: "How do I log in?",
+    k: ["password", "account", "sign up", "signup", "create account", "log in", "login", "sign in"],
+    a: "First time? Tap Create Account, enter your full name, choose your school, and make a password (at least 6 characters). Next time, tap Log In with the same name, school, and password."
   }
 ];
 const botSay = t => {
@@ -1220,7 +1555,7 @@ function answer(t) {
   });
   return best
       ? best.a
-      : "I can help with reporting lost or found items, the verification code, claiming an item, searching, and logging out. Try one of the questions below.";
+      : "I can help with reporting lost or found items, the verification code, claiming an item, searching, and logging in or out. Try one of the questions below.";
 }
 
 function reply(t) {
@@ -1250,7 +1585,6 @@ $("chips").addEventListener("click", e => {
   }
 });
 
-restore();
 </script>
 </body>
 </html>
