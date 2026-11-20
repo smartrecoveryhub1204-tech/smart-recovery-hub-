@@ -122,6 +122,50 @@ button:active {
   cursor: wait;
 }
 
+/* ---------- Public first page ---------- */
+.pub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.pub-card {
+  margin-bottom: 0;
+}
+
+.pub-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 8px 0;
+}
+
+.pub-ph {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf3ff;
+  border-radius: 10px;
+  margin: 8px 0;
+  font-size: 40px;
+}
+
+.pub-card h3 {
+  color: var(--green);
+  margin-bottom: 4px;
+}
+
+.pub-card button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.pub-btns button {
+  margin-left: 6px;
+}
+
 /* ---------- Header & menu ---------- */
 header {
   background: var(--green);
@@ -481,6 +525,143 @@ label {
   color: #664d03;
 }
 
+/* ---------- Privacy & safety ---------- */
+#blurCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #eee;
+  margin: 8px 0;
+  cursor: crosshair;
+}
+
+.blur-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.blur-tools input[type=range] {
+  width: 130px;
+  margin: 0;
+  padding: 0;
+}
+
+.sensitive-box {
+  background: #fff3cd;
+  color: #664d03;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.alert-banner {
+  background: #ffe8cc;
+  color: #7a3b00;
+  border: 1px solid #f5c58a;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.badge.donated,
+.badge.turned-over {
+  background: #e8dcff;
+  color: #4b2a9a;
+}
+
+.badge.unclaimed {
+  background: #ffe8cc;
+  color: #9a4a00;
+}
+
+.badge.sensitive {
+  background: #333;
+  color: #fff;
+}
+
+.audit-row p {
+  margin: 3px 0;
+  font-size: 14px;
+}
+
+/* ---------- Account review ---------- */
+.badge.st-active {
+  background: #dff5e7;
+  color: #08752f;
+}
+
+.badge.st-under_review {
+  background: #fff3cd;
+  color: #664d03;
+}
+
+.badge.st-restricted {
+  background: #ffe8cc;
+  color: #8a4b00;
+}
+
+.badge.st-suspended {
+  background: #ffe1e1;
+  color: #a00000;
+}
+
+.badge.st-banned {
+  background: #2b2b2b;
+  color: #fff;
+}
+
+.acct-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.acct-row code,
+#accountDetail code {
+  word-break: break-all;
+  font-size: 12px;
+  background: #eef3ef;
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+
+.acct-counts span {
+  display: inline-block;
+  margin: 0 12px 6px 0;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 90px;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  background: var(--green);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+  z-index: 1600;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+@media (max-width: 700px) {
+  .acct-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 /* ---------- Tutorial ---------- */
 .steps {
   list-style: none;
@@ -696,11 +877,50 @@ label {
 <body>
 
 <!-- Login / Create Account -->
-<div id="loginPage">
+<!-- Public page: anyone can see the reported items; logging in is only needed to report or claim -->
+<div id="publicPage">
+  <header>
+    <div class="nav">
+      <div class="logo"><img class="logo-icon" alt=""><span>Smart Recovery Hub</span></div>
+      <div class="pub-btns">
+        <button class="secondary" onclick="goLogin('login')">Log In</button>
+        <button class="secondary" onclick="goLogin('signup')">Create Account</button>
+      </div>
+    </div>
+  </header>
+  <div class="container">
+    <div class="hero">
+      <h1>Lost something? Found something?</h1>
+      <p>See the items that were reported at our schools. To report an item or claim one, log in or create an account.</p>
+      <br>
+      <button class="secondary" onclick="goLogin('signup', 'report')">📝 Report an Item</button>
+    </div>
+    <div class="card">
+      <div class="filters">
+        <input id="pubSearch" placeholder="🔍 Search reported items..." oninput="renderPublic()">
+        <select id="pubType" onchange="renderPublic()">
+          <option value="">All</option>
+          <option>Lost</option>
+          <option>Found</option>
+        </select>
+      </div>
+      <select id="pubSchool" onchange="renderPublic()">
+        <option value="">All schools</option>
+      </select>
+      <p class="small" id="pubCount"></p>
+    </div>
+    <div id="publicList" class="pub-grid"></div>
+    <p class="small" style="margin-top:14px">For privacy, only the item name, place, date, school and a small photo are shown. Descriptions and details are for logged-in students of the same school.</p>
+  </div>
+</div>
+
+<div id="loginPage" class="hidden">
   <div class="login-card">
+    <button class="secondary" style="margin-bottom:12px" onclick="backToPublic()">← Back to reported items</button>
     <img id="loginLogo" class="login-logo" alt="Smart Recovery Hub: Lost and Found, Made Simple">
     <h1 class="sr-only">Smart Recovery Hub</h1>
     <p class="small">A Web-Based Lost and Found System for User-Friendly Recovery</p>
+    <div class="notice hidden" id="loginNote"></div>
     <div class="tabs">
       <button id="tabLogin" class="active" onclick="setAuthMode('login')">Log In</button>
       <button id="tabSignup" onclick="setAuthMode('signup')">Create Account</button>
@@ -735,18 +955,23 @@ label {
       <div class="logo"><img class="logo-icon" alt=""><span>Smart Recovery Hub</span></div>
       <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
       <div id="menu" class="menu">
-        <button onclick="showPage('home')">🏠 Home</button>
-        <button onclick="showPage('report')">📝 Report Item</button>
-        <button onclick="showPage('items')">🔎 Items</button>
-        <button onclick="showPage('matches')">🧩 Smart Matches</button>
+        <button data-access onclick="showPage('home')">🏠 Home</button>
+        <button data-access onclick="showPage('report')">📝 Report Item</button>
+        <button data-access onclick="showPage('items')">🔎 Items</button>
+        <button data-access onclick="showPage('matches')">🧩 Smart Matches</button>
         <button onclick="showPage('tutorial')">📖 How to Use</button>
         <button onclick="showPage('credits')">👥 Credits</button>
-        <button onclick="showPage('admin')">🛠️ Admin</button>
+        <button data-access onclick="showPage('admin')">🛠️ Admin</button>
+        <button data-access onclick="showPage('audit')">🧾 Audit Log</button>
+        <button id="menuAccounts" class="hidden" onclick="showPage('accounts')">🛡️ Account Review</button>
+        <button onclick="showPage('myaccount')">👤 My Account <span id="noticeDot" class="hidden">🔵</span></button>
         <button onclick="logout()">🚪 Logout</button>
       </div>
     </div>
   </header>
   <div class="container">
+    <div id="accountBanner"></div>
+    <div id="toast" class="toast hidden" onclick="showPage('myaccount')"></div>
 
     <!-- Home page -->
     <section id="home" class="page active">
@@ -802,6 +1027,7 @@ label {
         <h2>📝 Report Item</h2>
         <p class="small">Your report is assigned to your school automatically.</p>
         <div class="school-lock">🏫 Reporting School: <strong id="reportSchool"></strong></div>
+        <div class="notice">🔒 Privacy reminder: never post names, ID numbers, or card/ATM digits. Blur them on the photo and keep them out of the description.</div>
         <label>Report Type</label>
         <select id="reportType" onchange="updateReportLabels()">
           <option value="Lost">Lost Item</option>
@@ -815,12 +1041,23 @@ label {
         <input id="itemLocation" placeholder="Where was the item lost/found?">
         <div id="foundBox" class="hidden">
           <p class="small">🛡️ Found items must be brought to the Guard House.</p>
+          <label style="font-weight:normal;display:block;margin-bottom:6px"><input type="checkbox" id="sensitiveToggle" style="width:auto;margin:0 6px 0 0">🔒 Sensitive item (ID, ATM card, wallet…)</label>
+          <p class="small">Sensitive items hide the photo and description from other students until the owner enters your code. School admins can still review them, and that is recorded in the audit log.</p>
         </div>
         <label>Date</label>
         <input id="itemDate" type="date">
         <label id="photoLabel">📷 Photo of Lost Item</label>
         <input id="itemPhoto" type="file" accept="image/*">
         <p class="small">A photo is required.</p>
+        <div id="blurBox" class="hidden">
+          <p class="small">🖍️ Drag your finger over names, ID numbers, and card digits to blur them. Only the blurred photo is saved. The original never leaves your phone.</p>
+          <canvas id="blurCanvas"></canvas>
+          <div class="blur-tools">
+            <label style="font-weight:normal">Brush <input id="brushSize" type="range" min="15" max="90" value="40"></label>
+            <button class="secondary" onclick="blurAll()">Blur whole photo</button>
+            <button class="secondary" onclick="resetBlur()">Undo all blur</button>
+          </div>
+        </div>
         <button class="primary" onclick="submitReport()">Submit Report</button>
       </div>
     </section>
@@ -841,10 +1078,88 @@ label {
             <option>Lost</option>
             <option>Found</option>
             <option>Returned</option>
+            <option>Donated</option>
+            <option>Turned over</option>
           </select>
         </div>
       </div>
       <div id="reportsContainer"></div>
+    </section>
+
+    <!-- Audit Log page -->
+    <section id="audit" class="page">
+      <div class="hero">
+        <h1>🧾 Audit Log</h1>
+        <p>A read-only record of important actions at your school.</p>
+      </div>
+      <div class="notice" id="auditNotice">This page is for authorized administrators only.</div>
+      <div id="auditPanel" class="hidden">
+        <div class="card">
+          <div class="filters" style="grid-template-columns:1fr 1fr">
+            <div><label for="auditFrom">From</label><input id="auditFrom" type="date" onchange="renderAudit()"></div>
+            <div><label for="auditTo">To</label><input id="auditTo" type="date" onchange="renderAudit()"></div>
+          </div>
+          <label for="auditAction">Action</label>
+          <select id="auditAction" onchange="renderAudit()"></select>
+          <button class="primary" onclick="exportAudit()">⬇ Download CSV</button>
+          <button class="secondary" onclick="copyAudit()">📋 Copy CSV</button>
+          <p class="small" id="auditCount"></p>
+        </div>
+        <div id="auditList"></div>
+      </div>
+    </section>
+
+    <!-- My Account page -->
+    <section id="myaccount" class="page">
+      <div class="hero">
+        <h1>👤 My Account</h1>
+        <p>Your account status, notices, and appeals.</p>
+      </div>
+      <div id="myAccountBox"></div>
+      <div class="card" id="appealCard">
+        <h2>📨 Appeal</h2>
+        <div id="appealInfo"></div>
+        <div id="appealForm">
+          <p class="small">If you think a restriction, suspension, or ban is a mistake, explain why. A school admin will review it.</p>
+          <label for="appealText">Your appeal</label>
+          <textarea id="appealText" maxlength="1000" placeholder="Write at least 10 characters..."></textarea>
+          <button id="appealBtn" class="primary" onclick="sendAppeal()">Send appeal</button>
+        </div>
+        <div id="myAppeals"></div>
+      </div>
+      <div class="card">
+        <h2>🔔 Account notices</h2>
+        <div id="noticeList"></div>
+      </div>
+    </section>
+
+    <!-- Account Review Center page -->
+    <section id="accounts" class="page">
+      <div class="hero">
+        <h1>🛡️ Account Review Center</h1>
+        <p>Review student accounts, warnings, restrictions, and appeals for your school.</p>
+      </div>
+      <div class="notice" id="accountsNotice">This page is for authorized administrators only.</div>
+      <div id="accountsPanel" class="hidden">
+        <div class="card">
+          <div id="accountStats"></div>
+          <p class="small">No passwords are stored or shown here. Sign-in is handled by Firebase Authentication. Nothing is banned automatically: an admin must review and decide.</p>
+          <div class="filters">
+            <input id="acctSearch" placeholder="🔍 Search by name or account ID..." oninput="renderAccounts()">
+            <select id="acctStatus" onchange="renderAccounts()">
+              <option value="">All statuses</option>
+              <option value="active">Active</option>
+              <option value="under_review">Under Review</option>
+              <option value="restricted">Restricted</option>
+              <option value="suspended">Suspended</option>
+              <option value="banned">Banned</option>
+            </select>
+          </div>
+        </div>
+        <div id="appealsBox"></div>
+        <div id="accountDetail"></div>
+        <div id="accountList"></div>
+      </div>
     </section>
 
     <!-- Smart Matches page -->
@@ -893,6 +1208,14 @@ label {
         <div class="tip">💡 Before you share the code, ask the person to describe the item so you know it is really theirs.</div>
       </div>
       <div class="card">
+        <h2>🔒 Protect your privacy</h2>
+        <ol class="steps">
+          <li>On the photo, drag your finger over names, ID numbers, and card digits to blur them. Only the blurred photo is saved.</li>
+          <li>Never type names, ID numbers, or card digits in the description.</li>
+          <li>Found an ID, ATM card, or wallet? Turn on <strong>Sensitive item</strong>. Its photo and details stay hidden until the owner enters your code.</li>
+        </ol>
+      </div>
+      <div class="card">
         <h2>🔎 Is it my item? (claiming)</h2>
         <ol class="steps">
           <li>Open <strong>Items</strong>. Search by name, or filter by Lost, Found, or Returned.</li>
@@ -906,6 +1229,7 @@ label {
         <ol class="steps">
           <li>The code is saved only on the phone or browser you used to report. Do not clear your browser data until the item is returned.</li>
           <li>Returned items are removed automatically after 24 hours.</li>
+          <li>If your account is restricted or suspended, open <strong>My Account</strong> to see why and to send an appeal.</li>
           <li>Stuck? Tap the 💬 button at the bottom right to ask the Recovery Helper.</li>
           <li>Using a shared device? Tap <strong>Logout</strong> in the ☰ Menu when you are done.</li>
         </ol>
@@ -954,6 +1278,15 @@ label {
           <h2>🛠️ Admin Dashboard</h2>
           <p>School: <strong id="adminSchool"></strong></p>
         </div>
+        <div id="unclaimedBar"></div>
+        <div class="card">
+          <h3>⚙️ Admin settings</h3>
+          <label for="unclaimedDays">Days before a found item counts as unclaimed</label>
+          <input id="unclaimedDays" type="number" min="1" max="365" value="30">
+          <button class="primary" onclick="saveSettings()">Save</button>
+          <p class="small">Default is 30 days. Older found items get the tag “Unclaimed - Due for Turnover”.</p>
+        </div>
+        <div id="postBar"></div>
         <div id="adminReports"></div>
       </div>
     </section>
@@ -979,7 +1312,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import {
   getFirestore, collection, onSnapshot, doc, getDoc, setDoc, writeBatch,
-  serverTimestamp, query, where
+  serverTimestamp, query, where, getDocs, updateDoc
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-functions.js";
 
@@ -998,13 +1331,18 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 const auth = getAuth(app);
-const claimFn = httpsCallable(getFunctions(app, "us-central1"), "claimItem");
+const fns = getFunctions(app, "us-central1");
+const claimFn = httpsCallable(fns, "claimItem");
+const adminFn = httpsCallable(fns, "adminAction");
+const accountFn = httpsCallable(fns, "accountAction");
+const appealFn = httpsCallable(fns, "submitAppeal");
+const publicFn = httpsCallable(fns, "publicReports");
 
 const SCHOOLS = [
   "Cuenca Senior High School", "Cuenca National High School", "Fermin La Rosa National High School",
   "Cuenca Institute", "Kalayaan Christian School"
 ];
-let me = null, reports = [], unsub = null, isAdmin = false, authBusy = false;
+let me = null, reports = [], unsub = null, unsubSettings = null, unsubAudit = null, isAdmin = false, authBusy = false;
 const seen = new Set();
 
 // localStorage can be blocked inside embedded pages (like Google Apps Script), so use it safely.
@@ -1122,7 +1460,7 @@ window.submitAuth = async () => {
         ? await createUserWithEmailAndPassword(auth, email, pw)
         : await signInWithEmailAndPassword(auth, email, pw);
     const p = await loadProfile(cred.user, name, school);
-    me = { uid: cred.user.uid, name: p.name, schoolName: p.schoolName, role: p.role || "student" };
+    me = meFrom(cred.user.uid, p);
     $("loginPass").value = "";
     $("loginPass2").value = "";
     startApp();
@@ -1146,7 +1484,7 @@ onAuthStateChanged(auth, async user => {
     if (!snap.exists())
       return await signOut(auth);
     const p = snap.data();
-    me = { uid: user.uid, name: p.name, schoolName: p.schoolName, role: p.role || "student" };
+    me = meFrom(user.uid, p);
     startApp();
   }
   catch (e) {
@@ -1155,6 +1493,7 @@ onAuthStateChanged(auth, async user => {
 });
 
 function startApp() {
+  $("publicPage").classList.add("hidden");
   $("loginPage").classList.add("hidden");
   $("app").classList.remove("hidden");
   $("homeUser").textContent = me.name;
@@ -1162,10 +1501,17 @@ function startApp() {
   isAdmin = me.role === "admin";
   $("adminPanel").classList.toggle("hidden", !isAdmin);
   $("adminNotice").classList.toggle("hidden", isAdmin);
+  $("auditPanel").classList.toggle("hidden", !isAdmin);
+  $("auditNotice").classList.toggle("hidden", isAdmin);
   $("itemDate").value = new Date().toISOString().split("T")[0];
   updateReportLabels();
+  $("menuAccounts").classList.toggle("hidden", !isAdmin);
+  $("accountsPanel").classList.toggle("hidden", !isAdmin);
+  $("accountsNotice").classList.toggle("hidden", isAdmin);
   showPage("home");
-  listen();
+  if (!accountBlocked())
+    listen();
+  listenAccountData();
   if (!$("msgs").children.length)
     botSay("Hi " + me.name.split(" ")[0]
         + "! I can explain how to report, search, and claim items. Tap a question or type your own.");
@@ -1179,6 +1525,20 @@ window.logout = async () => {
   reports = [];
   isAdmin = false;
   seen.clear();
+  if (unsubSettings)
+    unsubSettings();
+  unsubSettings = null;
+  if (unsubAudit)
+    unsubAudit();
+  unsubAudit = null;
+  audits = [];
+  stopAccountListeners();
+  Object.keys(detailsCache).forEach(k => delete detailsCache[k]);
+  detailsTried.clear();
+  clearBlur();
+  $("unclaimedBar").innerHTML = "";
+  $("auditList").innerHTML = "";
+  [ "accountBanner", "accountList", "accountDetail", "appealsBox" ].forEach(i => $(i).innerHTML = "");
   try {
     await signOut(auth);
   }
@@ -1186,16 +1546,22 @@ window.logout = async () => {
     console.error(e);
   }
   $("app").classList.add("hidden");
-  $("loginPage").classList.remove("hidden");
+  $("loginPage").classList.add("hidden");
+  $("loginNote").classList.add("hidden");
+  $("publicPage").classList.remove("hidden");
+  loadPublic();
   ["loginName", "loginSchool", "loginPass", "loginPass2"].forEach(i => $(i).value = "");
   $("reportsContainer").innerHTML = "";
   $("matchesContainer").innerHTML = "";
+  postOff.clear();
   $("adminPanel").classList.add("hidden");
   setAuthMode("login");
 };
 
 window.toggleMenu = () => $("menu").classList.toggle("open");
 window.showPage = p => {
+  if (accountBlocked() && ![ "myaccount", "tutorial", "credits" ].includes(p))
+    p = "myaccount";
   document.querySelectorAll(".page").forEach(x => x.classList.remove("active"));
   $(p).classList.add("active");
   $("menu").classList.remove("open");
@@ -1241,21 +1607,37 @@ function compress(file) {
   });
 }
 
+// A small picture for the public first page (the full photo is only shown to logged-in students).
+function makeThumb(canvas) {
+  const w = 220, h = Math.max(1, Math.round(canvas.height * w / canvas.width));
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  c.getContext("2d").drawImage(canvas, 0, 0, w, h);
+  return c.toDataURL("image/jpeg", 0.6);
+}
+
 window.submitReport = async () => {
   if (!me)
     return alert("Please login first.");
+  if (accountLimited())
+    return alert(limitMessage());
   const type = $("reportType").value,
     itemName = $("itemName").value.trim(),
     description = $("itemDescription").value.trim(),
     location = $("itemLocation").value.trim(),
-    date = $("itemDate").value,
-    file = $("itemPhoto").files[0];
+    date = $("itemDate").value;
   if (!itemName || !description || !location || !date)
     return alert("Please complete all required fields.");
-  if (!file)
+  if (!blurState)
     return alert("Please upload a photo.");
+  if (!blurUsed && !confirm("You have not blurred anything on the photo.\n\nDoes it show a name, ID number, or card digits?\n\nTap Cancel to go back and blur them, or OK to submit it as it is."))
+    return;
+  const sensitive = type === "Found" && $("sensitiveToggle").checked;
   try {
-    const photo = await compress(file);
+    // Only the picture on the blur canvas is saved. The original file is never uploaded.
+    const photo = $("blurCanvas").toDataURL("image/jpeg", 0.7);
+    const thumb = sensitive ? "" : makeThumb($("blurCanvas"));
     let codes = [], hashes = [];
     if (type === "Found") {
       codes = genCodes();
@@ -1265,12 +1647,14 @@ window.submitReport = async () => {
       batch = writeBatch(db);
     batch.set(reportRef, {
       itemName,
-      description,
+      description: sensitive ? HIDDEN_TEXT : description,
       location,
       date,
       type,
       status: type,
-      photo,
+      photo: sensitive ? "" : photo,
+      thumb,
+      sensitive,
       schoolName: me.schoolName,
       reporterName: me.name,
       reporterId: me.uid,
@@ -1284,6 +1668,9 @@ window.submitReport = async () => {
     // The code's hash is kept in a private document that students cannot read.
     if (type === "Found")
       batch.set(doc(reportRef, "private", "verification"), { codeHashes: hashes, reporterId: me.uid, failedAttempts: 0 });
+    // Sensitive items keep their photo and description in a private document.
+    if (sensitive)
+      batch.set(doc(reportRef, "private", "details"), { photo, description, reporterId: me.uid });
     await batch.commit();
     if (type === "Found") {
       safeStore.set("founderCodes_" + reportRef.id, JSON.stringify(codes));
@@ -1293,6 +1680,8 @@ window.submitReport = async () => {
     else
       alert("✅ Lost item report submitted successfully!");
     ["itemName", "itemDescription", "itemLocation", "itemPhoto"].forEach(i => $(i).value = "");
+    $("sensitiveToggle").checked = false;
+    clearBlur();
     showPage("items");
   }
   catch (e) {
@@ -1306,6 +1695,16 @@ function listen() {
     return;
   if (unsub)
     unsub();
+  if (unsubSettings)
+    unsubSettings();
+  unsubSettings = onSnapshot(doc(db, "settings", me.schoolName), snap => {
+    const d = snap.exists() ? snap.data().unclaimedDays : null;
+    settings.unclaimedDays = Number.isInteger(d) ? d : 30;
+    if (isAdmin && document.activeElement !== $("unclaimedDays"))
+      $("unclaimedDays").value = settings.unclaimedDays;
+    renderReports();
+    renderAdmin();
+  }, e => console.error(e));
   unsub = onSnapshot(query(collection(db, "reports"), where("schoolName", "==", me.schoolName)), snap => {
     reports = [];
     snap.forEach(d => {
@@ -1317,10 +1716,12 @@ function listen() {
     renderReports();
     renderMatches();
     renderAdmin();
+    loadOwnDetails();
   }, e => {
     console.error(e);
     $("reportsContainer").innerHTML = '<div class="card"><h3>⚠️ Reports unavailable</h3><p class="small">Check your Firestore configuration and Rules.</p></div>';
   });
+  listenAudit();
 }
 
 function stats() {
@@ -1346,9 +1747,13 @@ window.renderReports = () => {
 
 function card(r, i) {
   const isNew = !seen.has(r.id);
+  const own = isMine(r);
+  const shown = r.sensitive ? detailsCache[r.id] : null;
+  const photo = r.sensitive ? (shown && shown.photo) : r.photo;
+  const desc = r.sensitive ? (shown ? shown.description : HIDDEN_TEXT) : r.description;
   let v = "";
-  if (r.type === "Found" && r.status !== "Returned") {
-    if (r.reporterId ? r.reporterId === me.uid : me.name === r.reporterName) {
+  if (r.type === "Found" && r.status === "Found") {
+    if (own) {
       const s = safeStore.get("founderCodes_" + r.id);
       if (s) {
         const c = JSON.parse(s);
@@ -1367,21 +1772,33 @@ function card(r, i) {
   }
   if (r.status === "Returned")
     v = '<div class="verification-box"><h3>✅ Item Returned</h3><p>This item was marked as returned.</p><p class="small">It is removed automatically after 24 hours.</p></div>';
+  if (r.status === "Donated" || r.status === "Turned over")
+    v = '<div class="verification-box"><h3>📦 Item ' + esc(r.status.toLowerCase()) + '</h3><p class="small">A school admin closed this report.</p></div>';
+  let lock = "";
+  if (r.sensitive)
+    lock = shown
+        ? '<p class="small">🔒 Sensitive item. Only the finder, the verified owner, and admins can see these details.</p>'
+        : '<div class="sensitive-box">🔒 <strong>Sensitive item.</strong> The photo and details are hidden for privacy. The owner can see them after entering the finder\'s code.'
+            + (isAdmin ? '<br><button class="secondary" style="margin-top:8px" onclick="revealDetails(\'' + r.id + '\')">👁 Reveal details (recorded in the audit log)</button>' : '')
+            + '</div>';
   return '<div class="card' + (isNew ? ' enter' : '') + '" style="--i:' + Math.min(i, 8)
-      + '"><span class="badge ' + esc(r.status.toLowerCase()) + '">' + esc(r.status) + '</span><h2>'
-      + esc(r.itemName) + '</h2>'
-      + (r.photo ? '<img class="report-image" src="' + esc(r.photo) + '" alt="Reported item">' : '') +
-    '<p><strong>Description:</strong> ' + esc(r.description)
-        + '</p><br><p>📍 <strong>Specific Item Location:</strong> ' + esc(r.location)
-        + '</p><p>📅 <strong>Date:</strong> ' + esc(r.date) + '</p><p>🏫 <strong>School:</strong> '
-        + esc(r.schoolName) + '</p><p>👤 <strong>Reported by:</strong> ' + esc(r.reporterName)
-        + '</p>' +
-    (r.type === "Found" ? '<p>🛡️ <strong>Return Location:</strong> Guard House</p>' : '') + v
-        + '</div>';
+      + '"><span class="badge ' + badgeClass(r.status) + '">' + esc(r.status) + '</span>'
+      + (r.sensitive ? ' <span class="badge sensitive">🔒 Sensitive</span>' : '')
+      + (isUnclaimed(r) ? ' <span class="badge unclaimed">Unclaimed - Due for Turnover</span>' : '')
+      + '<h2>' + esc(r.itemName) + '</h2>'
+      + (photo ? '<img class="report-image" src="' + esc(photo) + '" alt="Reported item">' : '') + lock
+      + '<p><strong>Description:</strong> ' + esc(desc)
+      + '</p><br><p>📍 <strong>Specific Item Location:</strong> ' + esc(r.location)
+      + '</p><p>📅 <strong>Date:</strong> ' + esc(r.date) + '</p><p>🏫 <strong>School:</strong> '
+      + esc(r.schoolName) + '</p><p>👤 <strong>Reported by:</strong> ' + esc(r.reporterName)
+      + '</p>' + (r.type === "Found" ? '<p>🛡️ <strong>Return Location:</strong> Guard House</p>' : '') + v
+      + '</div>';
 }
 
 // The server checks the code and marks the item as Returned (students cannot do it directly).
 window.claimItem = async (id) => {
+  if (accountLimited())
+    return alert(limitMessage());
   const code = $("code_" + id).value.trim().toUpperCase();
   if (!code)
     return alert("Please enter the code.");
@@ -1409,37 +1826,182 @@ window.copyCodes = id => {
       : alert(t);
 };
 
+function adminCard(r) {
+  const canPost = r.status === "Lost" || r.status === "Found";
+  const shown = r.sensitive ? detailsCache[r.id] : null;
+  const photo = r.sensitive ? (shown && shown.photo) : r.photo;
+  const desc = r.sensitive ? (shown ? shown.description : HIDDEN_TEXT) : r.description;
+  const btn = (fn, label) => '<button class="secondary" style="margin:8px 8px 0 0" onclick="' + fn + '(\'' + r.id + '\')">' + label + '</button>';
+  const tick = '<label style="font-weight:normal;display:block;margin:8px 0"><input type="checkbox" style="width:auto;margin:0 6px 0 0"'
+      + (postOff.has(r.id) ? '' : ' checked') + ' onchange="togglePost(\'' + r.id + '\', this.checked)">Include in the Facebook post</label>';
+  return '<div class="card"><span class="badge ' + badgeClass(r.status) + '">' + esc(r.status) + '</span>'
+      + (r.sensitive ? ' <span class="badge sensitive">🔒 Sensitive</span>' : '')
+      + (isUnclaimed(r) ? ' <span class="badge unclaimed">Unclaimed - Due for Turnover</span>' : '')
+      + '<h3>' + esc(r.itemName) + '</h3>'
+      + (photo ? '<img class="report-image" style="max-height:160px" src="' + esc(photo) + '" alt="Reported item">' : '')
+      + '<p>' + esc(desc) + '</p><p>📍 ' + esc(r.location) + '</p><p>👤 ' + esc(r.reporterName) + '</p>'
+      + (r.sensitive && !shown ? btn("revealDetails", "👁 Reveal details (logged)") : "")
+      + (canPost ? tick + btn("copyFbPost", "📋 Copy only this one") + (r.photo ? btn("savePhoto", "💾 Save photo") : "") : "")
+      + '<br><button class="danger" onclick="adminDelete(\'' + r.id + '\')">🗑️ Delete</button></div>';
+}
+
 function renderAdmin() {
   if (!isAdmin || !me)
     return;
+  renderUnclaimed();
+  renderPostBar();
   $("adminReports").innerHTML = reports.length
-      ? [...reports].sort((a, b) => getTime(b) - getTime(a))
-          .map(r => '<div class="card"><span class="badge ' + esc(r.status.toLowerCase()) + '">'
-              + esc(r.status) + '</span><h3>' + esc(r.itemName) + '</h3><p>' + esc(r.description)
-              + '</p><p>📍 ' + esc(r.location) + '</p><p>👤 ' + esc(r.reporterName)
-              + '</p><button class="danger" onclick="adminDelete(\'' + r.id
-              + '\')">🗑️ Delete</button></div>')
-          .join("")
+      ? [...reports].sort((a, b) => getTime(b) - getTime(a)).map(adminCard).join("")
       : '<div class="card empty">No reports for this school.</div>';
 }
+
+/* ---------- Facebook posts: one report = one post, several reports = one stacked post ---------- */
+// Paste your website link here to add it to the Facebook posts (leave "" to skip it).
+const SITE_URL = "";
+const postOff = new Set();   // reports the admin un-ticked (everything is ticked by default)
+
+const postable = () => reports.filter(r => r.status === "Lost" || r.status === "Found").sort((a, b) => getTime(b) - getTime(a));
+const picked = () => postable().filter(r => !postOff.has(r.id))
+    .sort((a, b) => (b.type === "Found") - (a.type === "Found"));   // Found items first
+
+function renderPostBar() {
+  const n = picked().length;
+  $("postBar").innerHTML = !postable().length ? "" :
+      '<div class="card"><h3>📢 Facebook post</h3>'
+      + '<p class="small">Every report that is ticked below goes into one stacked post. Untick the ones you do not want. One ticked report makes a single post.</p>'
+      + '<button class="secondary" style="margin:0 8px 8px 0" onclick="selectAllPosts(true)">Select all</button>'
+      + '<button class="secondary" style="margin:0 8px 8px 0" onclick="selectAllPosts(false)">Clear</button><br>'
+      + '<button class="primary" ' + (n ? '' : 'disabled ') + 'onclick="copySelectedPosts()">'
+      + (n === 0 ? "Nothing selected" : n === 1 ? "📋 Copy post (1 item)" : "📋 Copy 1 stacked post (" + n + " items)")
+      + '</button></div>';
+}
+
+window.togglePost = (id, on) => {
+  if (on)
+    postOff.delete(id);
+  else
+    postOff.add(id);
+  renderPostBar();
+};
+
+window.selectAllPosts = (on) => {
+  postable().forEach(r => on ? postOff.delete(r.id) : postOff.add(r.id));
+  renderAdmin();
+};
+
+// Builds a ready-to-paste Facebook post. It never includes the reporter's name.
+function facebookPostText(list) {
+  const lines = [];
+  if (list.length === 1) {
+    const r = list[0], found = r.type === "Found";
+    lines.push(
+      found ? "🔎 FOUND ITEM – Smart Recovery Hub" : "😢 LOST ITEM – Smart Recovery Hub",
+      "",
+      "Item: " + r.itemName,
+      "Description: " + r.description,
+      (found ? "Found at: " : "Last seen at: ") + r.location,
+      "Date: " + r.date,
+      "School: " + r.schoolName,
+      ""
+    );
+  }
+  else {
+    lines.push("📢 LOST & FOUND UPDATE – Smart Recovery Hub", list[0].schoolName, "");
+    list.forEach((r, i) => {
+      const found = r.type === "Found";
+      lines.push(
+        (i + 1) + ") " + (found ? "🔎 FOUND – " : "😢 LOST – ") + r.itemName,
+        "Description: " + r.description,
+        (found ? "Found at: " : "Last seen at: ") + r.location,
+        "Date: " + r.date,
+        ""
+      );
+    });
+  }
+  if (list.some(r => r.type === "Found"))
+    lines.push("🛡️ " + (list.length === 1 ? "The item is" : "Found items are") + " kept at the Guard House. If "
+        + (list.length === 1 ? "it is" : "one is") + " yours, log in to Smart Recovery Hub, open Items, and claim it with the finder's code.");
+  if (list.some(r => r.type === "Lost"))
+    lines.push("If you found " + (list.length === 1 ? "it" : "a lost item")
+        + ", please report it as a Found item on Smart Recovery Hub and bring it to the Guard House.");
+  if (SITE_URL)
+    lines.push("", "🌐 " + SITE_URL);
+  lines.push("", "#LostAndFound #SmartRecoveryHub");
+  return lines.join("\n");
+}
+
+async function copyText(t) {
+  try {
+    await navigator.clipboard.writeText(t);
+    return true;
+  }
+  catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = t;
+    ta.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+}
+
+async function copyPost(list) {
+  const text = facebookPostText(list);
+  if (await copyText(text))
+    alert("✅ " + (list.length === 1 ? "Facebook post" : "Stacked post of " + list.length + " items")
+        + " copied!\n\nOpen your Facebook Page, paste it, and attach the photo" + (list.length === 1 ? "." : "s.")
+        + "\n\nCheck the photos first: do not post IDs, names, or phone numbers.");
+  else
+    prompt("Select all, copy, and paste into Facebook:", text);
+}
+
+window.copySelectedPosts = async () => {
+  if (!isAdmin)
+    return alert("Admin access required.");
+  const list = picked();
+  if (!list.length)
+    return alert("Tick at least one report first.");
+  await copyPost(list);
+};
+
+window.copyFbPost = async (id) => {
+  if (!isAdmin)
+    return alert("Admin access required.");
+  const r = reports.find(x => x.id === id);
+  if (!r)
+    return alert("Report not found.");
+  await copyPost([r]);
+};
+
+window.savePhoto = (id) => {
+  const r = reports.find(x => x.id === id);
+  if (!r || !r.photo)
+    return alert("No photo found.");
+  const a = document.createElement("a");
+  a.href = r.photo;
+  a.download = (r.itemName || "item").replace(/[^a-z0-9]+/gi, "-").toLowerCase() + ".jpg";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
 
 window.adminDelete = async (id) => {
   if (!isAdmin)
     return alert("Admin access required.");
   const r = reports.find(x => x.id === id);
-  if (!r || r.schoolName !== me.schoolName || !confirm("Delete this report?"))
+  if (!r || r.schoolName !== me.schoolName || !confirm("Delete this report?\n\nThis is recorded in the audit log."))
     return;
   try {
-    const batch = writeBatch(db), ref = doc(db, "reports", id);
-    batch.delete(ref);
-    batch.delete(doc(ref, "private", "verification"));
-    await batch.commit();
+    await adminFn({ type: "delete", reportId: id });
     safeStore.remove("founderCodes_" + id);
     alert("✅ Report deleted.");
   }
   catch (e) {
     console.error(e);
-    alert("Failed to delete report.\n\nReason: " + (e.code || e.message));
+    alert(e.message || "Failed to delete report.");
   }
 };
 
@@ -1473,7 +2035,10 @@ function scoreMatch(l, f) {
     location: similarity(l.location, f.location),
     date: dateScore(l.date, f.date)
   };
-  const score = Object.keys(MATCH_WEIGHTS).reduce((sum, k) => sum + MATCH_WEIGHTS[k] * parts[k], 0);
+  // A sensitive item's description is hidden, so it is left out of the comparison (the other weights are scaled up).
+  const keys = Object.keys(MATCH_WEIGHTS).filter(k => !(k === "description" && (l.sensitive || f.sensitive)));
+  const total = keys.reduce((sum, k) => sum + MATCH_WEIGHTS[k], 0);
+  const score = keys.reduce((sum, k) => sum + MATCH_WEIGHTS[k] * parts[k], 0) / total;
   return { score, parts };
 }
 
@@ -1522,6 +2087,781 @@ window.renderMatches = () => {
       ? list.map(matchCard).join("")
       : '<div class="card empty"><h3>No possible matches yet</h3><p>When a Lost and a Found report look alike, they will appear here.</p></div>';
 };
+
+/* ---------- Privacy & safety ---------- */
+const HIDDEN_TEXT = "🔒 Hidden (sensitive item)";
+const settings = { unclaimedDays: 30 };
+const detailsCache = {};      // private photo + description of sensitive items this person may see
+const detailsTried = new Set();
+let audits = [];
+const badgeClass = s => String(s).toLowerCase().replace(/\s+/g, "-");
+const daysOld = r => r.createdAt && r.createdAt.toMillis ? (Date.now() - r.createdAt.toMillis()) / 864e5 : 0;
+const isUnclaimed = r => r.type === "Found" && r.status === "Found" && daysOld(r) >= settings.unclaimedDays;
+
+// The finder (and, after the code is verified, the owner) loads the private details of a sensitive item.
+async function loadOwnDetails() {
+  for (const r of reports) {
+    const key = r.id + ":" + (r.claimerId || "");
+    if (!r.sensitive || detailsCache[r.id] || detailsTried.has(key))
+      continue;
+    if (!(isMine(r) || r.claimerId === me.uid))
+      continue;
+    detailsTried.add(key);
+    try {
+      const snap = await getDoc(doc(db, "reports", r.id, "private", "details"));
+      if (snap.exists()) {
+        detailsCache[r.id] = snap.data();
+        renderReports();
+        renderAdmin();
+      }
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+}
+
+// Admins can only see sensitive details through the server, which records it in the audit log.
+window.revealDetails = async (id) => {
+  if (!isAdmin)
+    return;
+  if (!confirm("Reveal the private details of this sensitive item?\n\nThis is recorded in the audit log."))
+    return;
+  try {
+    const res = await adminFn({ type: "viewSensitive", reportId: id });
+    detailsCache[id] = res.data;
+    renderReports();
+    renderAdmin();
+  }
+  catch (e) {
+    console.error(e);
+    alert(e.message || "Unable to reveal the details.");
+  }
+};
+
+/* ---------- Photo blur (the original photo is never saved) ---------- */
+let blurState = null, blurUsed = false, painting = false, lastPt = null;
+const blurCanvas = $("blurCanvas");
+
+function clearBlur() {
+  blurState = null;
+  blurUsed = false;
+  blurCanvas.width = blurCanvas.height = 1;
+  $("blurBox").classList.add("hidden");
+}
+
+function loadBlurImage(file) {
+  const url = URL.createObjectURL(file), img = new Image();
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    const s = Math.min(1, 900 / img.width), w = Math.round(img.width * s), h = Math.round(img.height * s);
+    const orig = document.createElement("canvas");
+    orig.width = w;
+    orig.height = h;
+    orig.getContext("2d").drawImage(img, 0, 0, w, h);
+    // A mosaic copy of the whole photo. The brush paints this copy over the picture.
+    const block = Math.max(12, Math.round(w / 45)), small = document.createElement("canvas");
+    small.width = Math.max(1, Math.round(w / block));
+    small.height = Math.max(1, Math.round(h / block));
+    small.getContext("2d").drawImage(orig, 0, 0, small.width, small.height);
+    const pix = document.createElement("canvas");
+    pix.width = w;
+    pix.height = h;
+    const pc = pix.getContext("2d");
+    pc.imageSmoothingEnabled = false;
+    pc.drawImage(small, 0, 0, small.width, small.height, 0, 0, w, h);
+    blurCanvas.width = w;
+    blurCanvas.height = h;
+    blurState = { orig, pix };
+    blurUsed = false;
+    resetBlur();
+    $("blurBox").classList.remove("hidden");
+  };
+  img.onerror = () => {
+    URL.revokeObjectURL(url);
+    clearBlur();
+    alert("Sorry, that photo could not be opened. Please choose another one.");
+  };
+  img.src = url;
+}
+
+window.resetBlur = () => {
+  if (!blurState)
+    return;
+  blurCanvas.getContext("2d").drawImage(blurState.orig, 0, 0);
+  blurUsed = false;
+};
+
+window.blurAll = () => {
+  if (!blurState)
+    return;
+  blurCanvas.getContext("2d").drawImage(blurState.pix, 0, 0);
+  blurUsed = true;
+};
+
+const brushPx = () => $("brushSize").value * blurCanvas.width / blurCanvas.getBoundingClientRect().width;
+
+function pointOf(e) {
+  const r = blurCanvas.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * blurCanvas.width / r.width, y: (e.clientY - r.top) * blurCanvas.height / r.height };
+}
+
+function stamp(x, y) {
+  const c = blurCanvas.getContext("2d");
+  c.save();
+  c.beginPath();
+  c.arc(x, y, brushPx() / 2, 0, Math.PI * 2);
+  c.clip();
+  c.drawImage(blurState.pix, 0, 0);
+  c.restore();
+  blurUsed = true;
+}
+
+function paintTo(p) {
+  const from = lastPt || p, dist = Math.hypot(p.x - from.x, p.y - from.y);
+  const steps = Math.max(1, Math.ceil(dist / Math.max(2, brushPx() / 4)));
+  for (let k = 1; k <= steps; k++)
+    stamp(from.x + (p.x - from.x) * k / steps, from.y + (p.y - from.y) * k / steps);
+  lastPt = p;
+}
+
+blurCanvas.addEventListener("pointerdown", e => {
+  if (!blurState)
+    return;
+  painting = true;
+  lastPt = null;
+  blurCanvas.setPointerCapture(e.pointerId);
+  paintTo(pointOf(e));
+});
+blurCanvas.addEventListener("pointermove", e => {
+  if (painting)
+    paintTo(pointOf(e));
+});
+["pointerup", "pointercancel", "pointerleave"].forEach(ev => blurCanvas.addEventListener(ev, () => {
+  painting = false;
+  lastPt = null;
+}));
+$("itemPhoto").addEventListener("change", () => {
+  const f = $("itemPhoto").files[0];
+  if (f)
+    loadBlurImage(f);
+  else
+    clearBlur();
+});
+
+/* ---------- Unclaimed items (admin) ---------- */
+const dueList = () => reports.filter(isUnclaimed).sort((a, b) => getTime(a) - getTime(b));
+
+function renderUnclaimed() {
+  const due = dueList();
+  $("unclaimedBar").innerHTML = !due.length ? "" :
+      '<div class="alert-banner">⚠️ <strong>' + due.length + ' found item' + (due.length > 1 ? 's are' : ' is')
+      + ' past ' + settings.unclaimedDays + ' days</strong> and due for turnover. Please donate ' + (due.length > 1 ? 'them' : 'it')
+      + ' or turn ' + (due.length > 1 ? 'them' : 'it') + ' over to the school office.</div>'
+      + '<div class="card"><h3>⏰ Unclaimed - Due for Turnover</h3>'
+      + due.map(r => '<div class="verification-box"><strong>' + esc(r.itemName) + '</strong>'
+          + '<p class="small">📍 ' + esc(r.location) + ' · ' + Math.floor(daysOld(r)) + ' days old</p>'
+          + '<button class="secondary" style="margin-right:8px" onclick="closeItem(\'' + r.id + '\', \'donate\')">🎁 Mark Donated</button>'
+          + '<button class="secondary" onclick="closeItem(\'' + r.id + '\', \'turnover\')">🏛️ Mark Turned over</button></div>').join("")
+      + '</div>';
+}
+
+window.closeItem = async (id, type) => {
+  if (!isAdmin)
+    return alert("Admin access required.");
+  const note = prompt(type === "donate" ? "Donated to (optional):" : "Turned over to (optional):", "");
+  if (note === null)
+    return;
+  try {
+    await adminFn({ type, reportId: id, note: note.trim() });
+    alert("✅ Done. It is saved in the audit log.");
+  }
+  catch (e) {
+    console.error(e);
+    alert(e.message || "Something went wrong.");
+  }
+};
+
+window.saveSettings = async () => {
+  if (!isAdmin)
+    return alert("Admin access required.");
+  const n = parseInt($("unclaimedDays").value, 10);
+  if (!(n >= 1 && n <= 365))
+    return alert("Enter a number of days from 1 to 365.");
+  try {
+    await adminFn({ type: "settings", unclaimedDays: n });
+    alert("✅ Settings saved.");
+  }
+  catch (e) {
+    console.error(e);
+    alert(e.message || "Unable to save the settings.");
+  }
+};
+
+/* ---------- Audit log (read-only; only the server writes to it) ---------- */
+const AUDIT_LABELS = {
+  item_returned: "Item returned",
+  item_donated: "Item donated",
+  item_turned_over: "Item turned over",
+  report_deleted: "Report deleted",
+  settings_changed: "Settings changed",
+  sensitive_viewed: "Sensitive details viewed",
+  campaign_created: "Campaign created",
+  campaign_closed: "Campaign closed",
+  schedule_uploaded: "Schedule uploaded",
+  account_warned: "Account warning",
+  account_review: "Account put under review",
+  account_restricted: "Account restricted",
+  account_suspended: "Account suspended",
+  account_banned: "Account banned",
+  account_restored: "Account restored",
+  account_appeal: "Appeal sent",
+  appeal_approved: "Appeal approved",
+  appeal_denied: "Appeal denied",
+  report_rejected: "Report rejected"
+};
+$("auditAction").innerHTML = '<option value="">All actions</option>'
+    + Object.keys(AUDIT_LABELS).map(k => '<option value="' + k + '">' + AUDIT_LABELS[k] + '</option>').join("");
+
+function listenAudit() {
+  if (!isAdmin)
+    return;
+  if (unsubAudit)
+    unsubAudit();
+  unsubAudit = onSnapshot(query(collection(db, "auditLogs"), where("schoolName", "==", me.schoolName)), snap => {
+    audits = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => getTime(b) - getTime(a));
+    renderAudit();
+  }, e => console.error(e));
+}
+
+function auditFiltered() {
+  const from = $("auditFrom").value ? new Date($("auditFrom").value + "T00:00:00").getTime() : 0;
+  const to = $("auditTo").value ? new Date($("auditTo").value + "T23:59:59").getTime() : Infinity;
+  const action = $("auditAction").value;
+  return audits.filter(a => {
+    const t = getTime(a);
+    return t >= from && t <= to && (!action || a.action === action);
+  });
+}
+
+const auditWhen = a => a.createdAt && a.createdAt.toDate ? a.createdAt.toDate().toLocaleString() : "";
+
+window.renderAudit = () => {
+  if (!isAdmin)
+    return;
+  const list = auditFiltered();
+  $("auditCount").textContent = list.length + " of " + audits.length + " entries shown";
+  $("auditList").innerHTML = list.length
+      ? list.map(a => '<div class="card audit-row"><p><strong>' + esc(AUDIT_LABELS[a.action] || a.action) + '</strong></p>'
+          + '<p>🕒 ' + esc(auditWhen(a)) + '</p><p>👤 ' + esc(a.actorName) + '</p>'
+          + (a.targetName ? '<p>📦 ' + esc(a.targetName) + '</p>' : '')
+          + (a.details ? '<p>📝 ' + esc(a.details) + '</p>' : '') + '</div>').join("")
+      : '<div class="card empty">No entries match.</div>';
+};
+
+function auditCsv() {
+  // A leading apostrophe stops spreadsheets from running text that starts with = + - or @
+  const cell = v => '"' + (/^[=+\-@]/.test(String(v)) ? "'" : "") + String(v ?? "").replace(/"/g, '""') + '"';
+  const rows = [["Date", "Action", "Done by", "Item", "Details"]]
+    .concat(auditFiltered().map(a => [auditWhen(a), AUDIT_LABELS[a.action] || a.action, a.actorName, a.targetName, a.details]));
+  return "\ufeff" + rows.map(r => r.map(cell).join(",")).join("\r\n");
+}
+
+window.exportAudit = () => {
+  if (!isAdmin)
+    return;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([auditCsv()], { type: "text/csv;charset=utf-8" }));
+  a.download = "audit-log.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+};
+
+window.copyAudit = async () => {
+  if (!isAdmin)
+    return;
+  if (await copyText(auditCsv()))
+    alert("✅ CSV copied. Paste it into a spreadsheet or a note.");
+  else
+    prompt("Select all, copy, and paste:", auditCsv());
+};
+
+/* ---------- Account status, notices and appeals ---------- */
+const STATUS_LABELS = { active: "Active", under_review: "Under Review", restricted: "Restricted", suspended: "Suspended", banned: "Banned" };
+const STATUS_HELP = {
+  active: "Your account is in good standing.",
+  under_review: "A school admin is looking at your account. You can keep using the site.",
+  restricted: "You can look at reports, but you cannot submit reports or claim items.",
+  suspended: "You cannot use Smart Recovery Hub until the suspension ends.",
+  banned: "Your account is banned. You cannot use Smart Recovery Hub."
+};
+const SEVERITY = { banned: 0, suspended: 1, restricted: 2, under_review: 3, active: 4 };
+const HISTORY_LABELS = {
+  warned: "⚠️ Warning", review: "🔍 Put under review", restricted: "🚫 Restricted", suspended: "⏸️ Suspended",
+  banned: "⛔ Banned", restored: "♻️ Restored", auto_restored: "♻️ Suspension ended", report_rejected: "🗑️ Report rejected",
+  appeal_submitted: "📨 Appeal sent", appeal_approved: "✅ Appeal approved", appeal_denied: "❌ Appeal denied"
+};
+let unsubAcct = null, unsubNotices = null, unsubMyAppeals = null, unsubUsers = null, unsubAppeals = null;
+let notices = [], noticesReady = false, myAppeals = [], accounts = [], appeals = [], selectedUid = null, detail = null, toastTimer = null;
+const shownNotices = new Set();
+
+// A suspension that has passed its end date counts as Active (the security rules and the server do the same).
+function effStatus(u) {
+  const until = u.statusUntil && u.statusUntil.toMillis ? u.statusUntil.toMillis() : 0;
+  return u.status === "suspended" && until && until <= Date.now() ? "active" : (u.status || "active");
+}
+
+function meFrom(uid, p) {
+  return {
+    uid, name: p.name, schoolName: p.schoolName, role: p.role || "student",
+    adminLevel: p.adminLevel === "senior" ? "senior" : "standard",
+    status: effStatus(p), statusReason: p.statusReason || "", statusUntil: p.statusUntil || null, warningCount: p.warningCount || 0
+  };
+}
+
+const accountBlocked = () => !!me && (me.status === "suspended" || me.status === "banned");
+const accountLimited = () => !!me && ["restricted", "suspended", "banned"].includes(me.status);
+const limitMessage = () => "Your account is " + STATUS_LABELS[me.status].toLowerCase()
+    + ", so you cannot submit reports or claim items.\n\nOpen My Account to see why or to send an appeal.";
+const statusBadge = s => '<span class="badge st-' + esc(s) + '">' + esc(STATUS_LABELS[s] || s) + '</span>';
+const fmtDate = t => t && t.toDate ? t.toDate().toLocaleString() : "";
+const fmtDay = t => t && t.toDate ? t.toDate().toLocaleDateString() : "";
+
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.remove("hidden");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add("hidden"), 9000);
+}
+
+function stopAccountListeners() {
+  [unsubAcct, unsubNotices, unsubMyAppeals, unsubUsers, unsubAppeals].forEach(u => { if (u) u(); });
+  unsubAcct = unsubNotices = unsubMyAppeals = unsubUsers = unsubAppeals = null;
+  notices = []; noticesReady = false; myAppeals = []; accounts = []; appeals = []; selectedUid = null; detail = null;
+  shownNotices.clear();
+}
+
+function listenAccountData() {
+  stopAccountListeners();
+  unsubAcct = onSnapshot(doc(db, "users", me.uid), snap => {
+    if (!snap.exists() || !me)
+      return;
+    Object.assign(me, meFrom(me.uid, snap.data()));
+    applyAccountState();
+  }, e => console.error(e));
+  unsubNotices = onSnapshot(query(collection(db, "accountNotices"), where("uid", "==", me.uid)), snap => {
+    notices = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => getTime(b) - getTime(a));
+    const fresh = notices.filter(n => !n.read && !shownNotices.has(n.id));
+    // Tell the student right away about a notice that arrives while the site is open.
+    if (noticesReady && fresh.length)
+      toast("🔔 " + fresh[0].title);
+    notices.forEach(n => shownNotices.add(n.id));
+    noticesReady = true;
+    renderNotices();
+  }, e => console.error(e));
+  unsubMyAppeals = onSnapshot(query(collection(db, "appeals"), where("uid", "==", me.uid)), snap => {
+    myAppeals = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => getTime(b) - getTime(a));
+    renderMyAccount();
+  }, e => console.error(e));
+  if (isAdmin) {
+    unsubUsers = onSnapshot(query(collection(db, "users"), where("schoolName", "==", me.schoolName)), snap => {
+      accounts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAccounts();
+    }, e => console.error(e));
+    unsubAppeals = onSnapshot(query(collection(db, "appeals"), where("schoolName", "==", me.schoolName)), snap => {
+      appeals = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAccounts();
+    }, e => console.error(e));
+  }
+}
+
+function applyAccountState() {
+  if (!me)
+    return;
+  renderAccountBanner();
+  renderMyAccount();
+  const blocked = accountBlocked();
+  document.querySelectorAll("#menu [data-access]").forEach(b => b.classList.toggle("hidden", blocked));
+  if (blocked) {
+    // Suspended and banned accounts only see My Account. The server and the rules enforce this too.
+    if (unsub)
+      unsub();
+    unsub = null;
+    if (unsubSettings)
+      unsubSettings();
+    unsubSettings = null;
+    reports = [];
+    if (!$("myaccount").classList.contains("active"))
+      showPage("myaccount");
+  }
+  else if (!unsub)
+    listen();
+}
+
+function renderAccountBanner() {
+  const s = me.status;
+  if (s === "active") {
+    $("accountBanner").innerHTML = "";
+    return;
+  }
+  const title = { under_review: "ℹ️ Your account is under review", restricted: "⚠️ Your account is restricted",
+    suspended: "⏸️ Your account is suspended", banned: "⛔ Your account is banned" }[s];
+  $("accountBanner").innerHTML = '<div class="alert-banner"><strong>' + title + '</strong><br>' + esc(STATUS_HELP[s])
+      + (me.statusReason ? '<br><strong>Reason:</strong> ' + esc(me.statusReason) : '')
+      + (s === "suspended" && me.statusUntil ? '<br><strong>Ends:</strong> ' + esc(fmtDate(me.statusUntil)) : '')
+      + '<br><button class="secondary" style="margin-top:8px" onclick="showPage(\'myaccount\')">Open My Account</button></div>';
+}
+
+function renderMyAccount() {
+  if (!me)
+    return;
+  const s = me.status, hasOpen = myAppeals.some(a => a.status === "open");
+  const canAppeal = ["restricted", "suspended", "banned"].includes(s);
+  $("myAccountBox").innerHTML = '<div class="card"><h2>' + esc(me.name) + '</h2><p>🏫 ' + esc(me.schoolName) + '</p>'
+      + '<p>Status: ' + statusBadge(s) + '</p><p class="small">' + esc(STATUS_HELP[s]) + '</p>'
+      + (me.statusReason && s !== "active" ? '<p><strong>Reason:</strong> ' + esc(me.statusReason) + '</p>' : '')
+      + (s === "suspended" && me.statusUntil ? '<p><strong>Suspension ends:</strong> ' + esc(fmtDate(me.statusUntil)) + '</p>' : '')
+      + (me.warningCount ? '<p>⚠️ Warnings on record: <strong>' + me.warningCount + '</strong></p>' : '') + '</div>';
+  $("appealCard").classList.toggle("hidden", !canAppeal && !myAppeals.length);
+  $("appealForm").classList.toggle("hidden", !canAppeal || hasOpen);
+  $("appealInfo").innerHTML = hasOpen ? '<p class="small">📨 Your appeal was sent and is waiting for a decision.</p>' : "";
+  $("myAppeals").innerHTML = myAppeals.map(a => '<div class="verification-box"><p><strong>'
+      + (a.status === "open" ? "Waiting for a decision" : a.status === "approved" ? "Approved" : "Not approved")
+      + '</strong> · ' + esc(fmtDay(a.createdAt)) + '</p><p>' + esc(a.message) + '</p>'
+      + (a.decisionNote ? '<p class="small">Admin note: ' + esc(a.decisionNote) + '</p>' : '') + '</div>').join("");
+  renderNotices();
+}
+
+function renderNotices() {
+  const unread = notices.filter(n => !n.read).length;
+  $("noticeDot").classList.toggle("hidden", !unread);
+  $("noticeList").innerHTML = notices.length
+      ? (unread ? '<button class="secondary" style="margin-bottom:10px" onclick="markNoticesRead()">Mark all as read</button>' : '')
+        + notices.slice(0, 30).map(n => '<div class="verification-box"' + (n.read ? '' : ' style="border-color:#2c7fd1"') + '><strong>'
+            + (n.read ? '' : '🔵 ') + esc(n.title) + '</strong><p>' + esc(n.message) + '</p><p class="small">'
+            + esc(fmtDate(n.createdAt)) + '</p></div>').join("")
+      : '<p class="small">No notices yet.</p>';
+}
+
+window.markNoticesRead = async () => {
+  const batch = writeBatch(db);
+  notices.filter(n => !n.read).forEach(n => batch.update(doc(db, "accountNotices", n.id), { read: true }));
+  try {
+    await batch.commit();
+  }
+  catch (e) {
+    console.error(e);
+    alert("Unable to update the notices.\n\nReason: " + (e.code || e.message));
+  }
+};
+
+window.sendAppeal = async () => {
+  const message = $("appealText").value.trim();
+  if (message.length < 10)
+    return alert("Please explain your appeal in at least 10 characters.");
+  const btn = $("appealBtn");
+  btn.disabled = true;
+  try {
+    await appealFn({ message });
+    $("appealText").value = "";
+    alert("✅ Your appeal was sent. A school admin will review it.");
+  }
+  catch (e) {
+    console.error(e);
+    alert(e.message || "Unable to send the appeal.");
+  }
+  finally {
+    btn.disabled = false;
+  }
+};
+
+/* ---------- Account Review Center (admins only) ---------- */
+function accountRow(a) {
+  const s = effStatus(a), adm = a.role === "admin";
+  return '<div class="card acct-row"><div><strong>' + esc(a.name) + '</strong> '
+      + (adm ? '<span class="badge st-active">Administrator</span>' : statusBadge(s))
+      + '<p class="small">🏫 ' + esc(a.schoolName) + '</p><p class="small">🆔 <code>' + esc(a.id) + '</code></p>'
+      + '<p class="small">📅 Registered ' + esc(fmtDay(a.createdAt))
+      + (a.warningCount ? ' · ⚠️ ' + a.warningCount + ' warning' + (a.warningCount > 1 ? 's' : '') : '') + '</p></div>'
+      + '<button class="primary" onclick="openAccount(\'' + esc(a.id) + '\')">Review</button></div>';
+}
+
+function renderAppealsBox(open) {
+  $("appealsBox").innerHTML = !open.length ? "" : '<div class="card"><h3>📨 Open appeals</h3>'
+      + [...open].sort((a, b) => getTime(a) - getTime(b)).map(a => '<div class="verification-box"><strong>' + esc(a.userName)
+          + '</strong> · ' + esc(fmtDay(a.createdAt)) + ' · was ' + esc(STATUS_LABELS[a.statusAtSubmit] || "")
+          + '<p>' + esc(a.message) + '</p>'
+          + '<button class="secondary" style="margin:0 8px 8px 0" onclick="openAccount(\'' + esc(a.uid) + '\')">View account</button>'
+          + '<button class="return" style="margin:0 8px 8px 0" onclick="decideAppeal(\'' + esc(a.id) + '\', \'approve\')">✅ Approve</button>'
+          + '<button class="danger" onclick="decideAppeal(\'' + esc(a.id) + '\', \'deny\')">❌ Deny</button></div>').join("")
+      + '</div>';
+}
+
+window.renderAccounts = () => {
+  if (!isAdmin || !me)
+    return;
+  const counts = {};
+  accounts.filter(a => a.role !== "admin").forEach(a => { const s = effStatus(a); counts[s] = (counts[s] || 0) + 1; });
+  const open = appeals.filter(a => a.status === "open");
+  $("accountStats").innerHTML = Object.keys(STATUS_LABELS).map(s => '<span style="display:inline-block;margin:0 12px 6px 0">'
+      + statusBadge(s) + ' <strong>' + (counts[s] || 0) + '</strong></span>').join("")
+      + '<span style="display:inline-block">📨 Open appeals: <strong>' + open.length + '</strong></span>';
+  renderAppealsBox(open);
+  const q = $("acctSearch").value.toLowerCase().trim(), f = $("acctStatus").value;
+  const list = accounts
+      .filter(a => (!q || (String(a.name) + " " + a.id).toLowerCase().includes(q)) && (!f || effStatus(a) === f))
+      .sort((a, b) => (SEVERITY[effStatus(a)] - SEVERITY[effStatus(b)]) || String(a.name).localeCompare(String(b.name)));
+  $("accountList").innerHTML = list.length ? list.map(accountRow).join("") : '<div class="card empty">No accounts match.</div>';
+  if (selectedUid)
+    renderAccountDetail();
+};
+
+window.openAccount = async (uid) => {
+  selectedUid = uid;
+  detail = null;
+  renderAccountDetail();
+  $("accountDetail").scrollIntoView({ behavior: "smooth", block: "start" });
+  try {
+    const [rs, hs] = await Promise.all([
+      getDocs(query(collection(db, "reports"), where("schoolName", "==", me.schoolName), where("reporterId", "==", uid))),
+      getDocs(query(collection(db, "accountActions"), where("schoolName", "==", me.schoolName), where("targetUid", "==", uid)))
+    ]);
+    if (selectedUid !== uid)
+      return;
+    detail = {
+      uid,
+      reports: rs.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => getTime(b) - getTime(a)),
+      history: hs.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => getTime(b) - getTime(a))
+    };
+    renderAccountDetail();
+  }
+  catch (e) {
+    console.error(e);
+    alert("Unable to load this account's history.\n\nReason: " + (e.code || e.message));
+  }
+};
+
+window.closeAccount = () => {
+  selectedUid = null;
+  detail = null;
+  $("accountDetail").innerHTML = "";
+};
+
+function renderAccountDetail() {
+  const a = accounts.find(x => x.id === selectedUid);
+  if (!a) {
+    $("accountDetail").innerHTML = "";
+    return;
+  }
+  const keepReason = $("acctReason") ? $("acctReason").value : "";
+  const keepDays = $("acctDays") ? $("acctDays").value : "7";
+  const s = effStatus(a), adm = a.role === "admin", self = a.id === me.uid, senior = me.adminLevel === "senior";
+  const h = detail && detail.uid === a.id ? detail : null;
+  const count = k => h ? h.history.filter(x => x.action === k).length : 0;
+  const manageable = !adm && !self;
+  const can = {
+    warn: manageable && s !== "banned",
+    review: manageable && s === "active",
+    restrict: manageable && ["active", "under_review"].includes(s),
+    suspend: manageable && ["active", "under_review", "restricted"].includes(s),
+    ban: manageable && senior && ["under_review", "restricted", "suspended"].includes(s),
+    restore: manageable && s !== "active" && (s !== "banned" || senior)
+  };
+  const btn = (type, label, cls) => '<button class="' + cls + '" style="margin:0 8px 8px 0"' + (can[type] ? '' : ' disabled')
+      + ' onclick="doAccountAction(\'' + type + '\')">' + label + '</button>';
+  const maxDays = senior ? 365 : 30;
+
+  const head = '<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">'
+      + '<h2>🛡️ Account review</h2><button class="secondary" onclick="closeAccount()">✖ Close</button></div>'
+      + '<p><strong>Name:</strong> ' + esc(a.name) + '</p><p><strong>School:</strong> ' + esc(a.schoolName) + '</p>'
+      + '<p><strong>Account ID:</strong> <code>' + esc(a.id) + '</code></p>'
+      + '<p><strong>Registered:</strong> ' + esc(fmtDate(a.createdAt)) + '</p>'
+      + '<p><strong>Status:</strong> ' + (adm ? '<span class="badge st-active">Administrator</span>' : statusBadge(s)) + '</p>'
+      + (a.statusReason && s !== "active" ? '<p><strong>Reason:</strong> ' + esc(a.statusReason) + '</p>' : '')
+      + (s === "suspended" && a.statusUntil ? '<p><strong>Suspension ends:</strong> ' + esc(fmtDate(a.statusUntil)) + '</p>' : '')
+      + '<p class="small">No passwords are stored or shown here. Sign-in is handled by Firebase Authentication.</p>'
+      + '<div class="acct-counts"><span>⚠️ Warnings: <strong>' + (a.warningCount || count("warned")) + '</strong></span>'
+      + '<span>🗑️ Rejected reports: <strong>' + count("report_rejected") + '</strong></span>'
+      + '<span>⛔ Bans: <strong>' + count("banned") + '</strong></span>'
+      + '<span>📨 Appeals: <strong>' + count("appeal_submitted") + '</strong></span></div></div>';
+
+  const actions = !manageable
+      ? '<div class="notice">' + (adm ? "Administrator accounts cannot be managed here." : "You cannot manage your own account.") + '</div>'
+      : '<div class="card"><h3>Actions</h3>'
+        + '<label for="acctReason">Reason (required, the student can see it)</label>'
+        + '<textarea id="acctReason" maxlength="300" placeholder="Explain what happened (at least 5 characters)">' + esc(keepReason) + '</textarea>'
+        + '<label for="acctDays">Suspension length in days (1 to ' + maxDays + ')</label>'
+        + '<input id="acctDays" type="number" min="1" max="' + maxDays + '" value="' + esc(keepDays) + '">'
+        + btn("warn", "⚠️ Warn", "secondary") + btn("review", "🔍 Under Review", "secondary")
+        + btn("restrict", "🚫 Restrict", "secondary") + btn("suspend", "⏸️ Suspend", "secondary")
+        + btn("ban", "⛔ Ban permanently", "danger") + btn("restore", "♻️ Restore", "return")
+        + '<p class="small">Your authority: <strong>' + (senior ? "Senior admin" : "Standard admin") + '</strong>. '
+        + (senior ? "You can ban permanently and restore bans." : "You can warn, review, restrict, suspend up to 30 days, and restore. Bans need a senior admin.")
+        + ' A ban needs a review first (Under Review, Restricted, or Suspended). Every action is saved in the audit log and the student is notified.</p></div>';
+
+  const histLine = x => '<div class="verification-box"><strong>' + esc(HISTORY_LABELS[x.action] || x.action) + '</strong> · ' + esc(fmtDate(x.createdAt))
+      + '<br><span class="small">By ' + esc(x.actorName || "") + (x.fromStatus || x.toStatus ? ' · ' + esc(STATUS_LABELS[x.fromStatus] || "") + ' → ' + esc(STATUS_LABELS[x.toStatus] || "") : '') + '</span>'
+      + (x.reason ? '<p>' + esc(x.reason) + '</p>' : '')
+      + (x.until && x.until.toDate ? '<p class="small">Until ' + esc(fmtDay(x.until)) + '</p>' : '') + '</div>';
+  const history = '<div class="card"><h3>Account history</h3>'
+      + (!h ? '<p class="small">Loading…</p>' : h.history.length ? h.history.map(histLine).join("") : '<p class="small">No warnings, rejected reports, restrictions, or appeals on record.</p>')
+      + '</div>';
+
+  const repLine = r => '<div class="verification-box"><span class="badge ' + badgeClass(r.status) + '">' + esc(r.type) + ' · ' + esc(r.status) + '</span>'
+      + (r.sensitive ? ' <span class="badge sensitive">🔒 Sensitive</span>' : '') + '<br><strong>' + esc(r.itemName) + '</strong>'
+      + '<p class="small">📍 ' + esc(r.location) + ' · 📅 ' + esc(r.date) + '</p>'
+      + (["Lost", "Found"].includes(r.status) ? '<button class="danger" onclick="rejectReport(\'' + esc(r.id) + '\')">🗑️ Reject report (misuse)</button>' : '') + '</div>';
+  const reps = '<div class="card"><h3>Report history</h3>'
+      + (!h ? '<p class="small">Loading…</p>' : h.reports.length ? h.reports.map(repLine).join("") : '<p class="small">No reports from this account.</p>')
+      + '</div>';
+
+  $("accountDetail").innerHTML = head + actions + history + reps;
+}
+
+window.doAccountAction = async (type) => {
+  const a = accounts.find(x => x.id === selectedUid);
+  if (!isAdmin || !a)
+    return;
+  const reason = $("acctReason").value.trim();
+  if (reason.length < 5)
+    return alert("A reason of at least 5 characters is required. The student will see it.");
+  const days = parseInt($("acctDays").value, 10);
+  if (type === "suspend" && !(days >= 1))
+    return alert("Enter how many days the suspension lasts.");
+  const verb = { warn: "warn", review: "put under review", restrict: "restrict", suspend: "suspend for " + days + " day(s)",
+    ban: "BAN PERMANENTLY", restore: "restore" }[type];
+  if (!confirm("Are you sure you want to " + verb + " " + a.name + "?\n\nReason: " + reason
+      + "\n\nThe student will be notified and this is saved in the audit log."))
+    return;
+  if (type === "ban" && !confirm("A ban stays until a senior admin restores it.\n\nHave you reviewed this account's report history?"))
+    return;
+  try {
+    await accountFn({ type, targetUid: a.id, reason, days: type === "suspend" ? days : undefined });
+    $("acctReason").value = "";
+    alert("✅ Done. The student was notified and it is saved in the audit log.");
+    await openAccount(a.id);
+  }
+  catch (e) {
+    console.error(e);
+    alert(e.message || "Something went wrong.");
+  }
+};
+
+window.rejectReport = async (reportId) => {
+  if (!isAdmin)
+    return;
+  const reason = prompt("Why is this report being rejected as misuse?\n(Required. The reporter will see it.)", "");
+  if (reason === null)
+    return;
+  if (reason.trim().length < 5)
+    return alert("A reason of at least 5 characters is required.");
+  if (!confirm("Reject and remove this report?\n\nIt is deleted, noted on the reporter's account, and saved in the audit log."))
+    return;
+  try {
+    await accountFn({ type: "rejectReport", reportId, reason: reason.trim() });
+    alert("✅ Report rejected and removed.");
+    if (selectedUid)
+      await openAccount(selectedUid);
+  }
+  catch (e) {
+    console.error(e);
+    alert(e.message || "Something went wrong.");
+  }
+};
+
+window.decideAppeal = async (appealId, decision) => {
+  if (!isAdmin)
+    return;
+  const note = prompt((decision === "approve" ? "Approve this appeal and restore the account." : "Deny this appeal and keep the decision.")
+      + "\n\nAdd a note for the student (required):", "");
+  if (note === null)
+    return;
+  if (note.trim().length < 5)
+    return alert("A note of at least 5 characters is required.");
+  try {
+    await accountFn({ type: "decideAppeal", appealId, decision, reason: note.trim() });
+    alert("✅ Appeal " + (decision === "approve" ? "approved" : "denied") + ". The student was notified.");
+    if (selectedUid)
+      await openAccount(selectedUid);
+  }
+  catch (e) {
+    console.error(e);
+    alert(e.message || "Something went wrong.");
+  }
+};
+
+/* ---------- Public first page (anyone can see reported items; logging in is needed to report or claim) ---------- */
+let publicItems = [], publicState = "loading";
+const GO_NOTES = {
+  report: "Please log in or create an account to report a lost or found item.",
+  claim: "Please log in with your school account to claim this item or see its full details.",
+  match: "Please log in with your school account to see the full details of this report."
+};
+$("pubSchool").innerHTML += SCHOOLS.map(sc => '<option>' + esc(sc) + '</option>').join("");
+
+window.goLogin = (mode, why) => {
+  $("publicPage").classList.add("hidden");
+  $("loginPage").classList.remove("hidden");
+  setAuthMode(mode === "signup" ? "signup" : "login");
+  $("loginNote").textContent = GO_NOTES[why] || "";
+  $("loginNote").classList.toggle("hidden", !GO_NOTES[why]);
+  window.scrollTo({ top: 0 });
+};
+
+window.backToPublic = () => {
+  $("loginPage").classList.add("hidden");
+  $("publicPage").classList.remove("hidden");
+};
+
+window.loadPublic = async () => {
+  publicState = "loading";
+  renderPublic();
+  try {
+    const res = await publicFn();
+    publicItems = (res.data && res.data.items) || [];
+    publicState = "ready";
+  }
+  catch (e) {
+    console.error(e);
+    publicState = "error";
+  }
+  renderPublic();
+};
+
+function pubCard(r) {
+  return '<div class="card pub-card"><span class="badge ' + badgeClass(r.type) + '">' + esc(r.type) + '</span>'
+      + (r.thumb ? '<img src="' + esc(r.thumb) + '" alt="' + esc(r.itemName) + '">' : '<div class="pub-ph">📦</div>')
+      + '<h3>' + esc(r.itemName) + '</h3>'
+      + '<p class="small">📍 ' + esc(r.location) + '</p><p class="small">📅 ' + esc(r.date) + '</p><p class="small">🏫 ' + esc(r.schoolName) + '</p>'
+      + '<button class="secondary" onclick="goLogin(\'login\', \'' + (r.type === "Found" ? "claim" : "match") + '\')">🔒 '
+      + (r.type === "Found" ? "Log in to claim" : "Log in for details") + '</button></div>';
+}
+
+window.renderPublic = () => {
+  const box = $("publicList");
+  if (publicState === "loading") {
+    $("pubCount").textContent = "";
+    box.innerHTML = '<div class="card empty">Loading reported items…</div>';
+    return;
+  }
+  if (publicState === "error") {
+    $("pubCount").textContent = "";
+    box.innerHTML = '<div class="card empty"><h3>Reported items are not available right now</h3>'
+        + '<p>You can still log in or create an account.</p><br><button class="secondary" onclick="loadPublic()">Try again</button></div>';
+    return;
+  }
+  const q = $("pubSearch").value.toLowerCase().trim(), t = $("pubType").value, sc = $("pubSchool").value;
+  const list = publicItems.filter(r => (!q || (r.itemName + " " + r.location + " " + r.schoolName).toLowerCase().includes(q))
+      && (!t || r.type === t) && (!sc || r.schoolName === sc));
+  $("pubCount").textContent = list.length + " reported item" + (list.length === 1 ? "" : "s") + " shown";
+  box.innerHTML = list.length ? list.map(pubCard).join("")
+      : '<div class="card empty" style="grid-column:1/-1"><h3>No reported items yet</h3><p>Be the first to report one.</p></div>';
+};
+
+loadPublic();
 
 /* ---------- Help assistant (rule-based, works offline) ---------- */
 const KB = [
@@ -1574,6 +2914,16 @@ const KB = [
     q: "What are Smart Matches?",
     k: ["match", "matches", "smart", "similar", "suggest"],
     a: "Smart Matches compares Lost and Found reports from your school and shows pairs that look alike. It is only a suggestion. To get an item back, ask the finder for the code and use Items."
+  },
+  {
+    q: "How do I protect my privacy?",
+    k: ["privacy", "blur", "sensitive", "atm", "id card", "private", "hide"],
+    a: "Drag your finger over names, ID numbers, and card digits on the photo to blur them. Only the blurred photo is saved. For an ID, ATM card, or wallet, turn on Sensitive item so the photo and details stay hidden until the owner enters your code."
+  },
+  {
+    q: "Why is my account restricted?",
+    k: ["restricted", "suspended", "banned", "ban", "appeal", "account status", "warning"],
+    a: "Open ☰ Menu → My Account to see your status, the reason, and when a suspension ends. If you think it is a mistake, send an appeal there."
   },
   {
     q: "How do I log in?",
